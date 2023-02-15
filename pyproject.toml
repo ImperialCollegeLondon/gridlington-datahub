@@ -1,0 +1,41 @@
+[project]
+name = "GridlingtonDataHub"
+version = "0.0.1"
+authors = [
+    { name = "Adrian D'Alessandro", email = "a.dalessandro@imperial.ac.uk" },
+    { name = "Callum West", email = "c.west@imperial.ac.uk" },
+    { name = "Dan Davies", email = "d.w.davies@imperial.ac.uk" },
+    { name = "Imperial College London RSE Team", email = "ict-rse-team@imperial.ac.uk" }
+]
+requires-python = ">=3.8"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "flake8",
+    "flake8-docstrings",
+    "isort",
+    "mypy",
+    "pip-tools",
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+    "pytest-flake8",
+    "pytest-mypy",
+    "pytest-mock"
+]
+
+[tool.mypy]
+disallow_any_explicit = true
+disallow_any_generics = true
+warn_unreachable = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+exclude = ["tests/", ".venv/"]
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+addopts = "-v --flake8 --mypy -p no:warnings --cov=myproject --cov-report=html:htmlcov/coverage --doctest-modules --ignore=myproject/__main__.py"
