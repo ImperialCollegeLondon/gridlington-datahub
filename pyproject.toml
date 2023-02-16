@@ -25,8 +25,8 @@ dev = [
     "pytest-mock"
 ]
 
-[tool.setuptools]
-packages = ["datahub"]
+[tool.setuptools.packages.find]
+exclude = ["htmlcov"]
 
 [tool.mypy]
 disallow_any_explicit = true
