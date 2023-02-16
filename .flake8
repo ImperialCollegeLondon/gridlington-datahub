@@ -5,3 +5,5 @@ exclude = .venv
 required-plugins =
 	flake8-docstring,
 docstring-convention = google
+per-file-ignores =
+    tests/*:D100
