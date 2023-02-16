@@ -1,5 +1,5 @@
 [project]
-name = "GridlingtonDataHub"
+name = "datahub"
 version = "0.0.1"
 authors = [
     { name = "Adrian D'Alessandro", email = "a.dalessandro@imperial.ac.uk" },
@@ -7,7 +7,7 @@ authors = [
     { name = "Dan Davies", email = "d.w.davies@imperial.ac.uk" },
     { name = "Imperial College London RSE Team", email = "ict-rse-team@imperial.ac.uk" }
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = []
 
 [project.optional-dependencies]
@@ -21,10 +21,12 @@ dev = [
     "pre-commit",
     "pytest",
     "pytest-cov",
-    "pytest-flake8",
     "pytest-mypy",
     "pytest-mock"
 ]
+
+[tool.setuptools]
+packages = ["datahub"]
 
 [tool.mypy]
 disallow_any_explicit = true
@@ -32,10 +34,10 @@ disallow_any_generics = true
 warn_unreachable = true
 warn_unused_ignores = true
 disallow_untyped_defs = true
-exclude = ["tests/", ".venv/"]
+exclude = [".venv/"]
 
 [tool.isort]
 profile = "black"
 
 [tool.pytest.ini_options]
-addopts = "-v --flake8 --mypy -p no:warnings --cov=myproject --cov-report=html:htmlcov/coverage --doctest-modules --ignore=myproject/__main__.py"
+addopts = "-v --mypy -p no:warnings --cov=datahub --cov-report=html --doctest-modules --ignore=datahub/__main__.py"

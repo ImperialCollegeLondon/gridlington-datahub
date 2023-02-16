@@ -18,7 +18,7 @@ To add/remove packages edit `pyproject.toml` and run the above command. To
 upgrade all existing dependencies run:
 
 ```
-pip-compile --upgrade pyproject.toml
+pip-compile --upgrade
 ```
 
 Dependencies for developers are listed separately as optional, with the pinned versions
