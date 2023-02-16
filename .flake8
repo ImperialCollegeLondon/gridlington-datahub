@@ -6,4 +6,4 @@ required-plugins =
 	flake8-docstring,
 docstring-convention = google
 per-file-ignores =
-    tests/*:D100
+    tests/*:D100,D104

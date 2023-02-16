@@ -36,6 +36,10 @@ warn_unused_ignores = true
 disallow_untyped_defs = true
 exclude = [".venv/"]
 
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
 [tool.isort]
 profile = "black"
 
