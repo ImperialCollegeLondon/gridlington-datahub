@@ -19,6 +19,8 @@ Dependencies for developers are listed separately as optional, with the pinned v
 
 When dependencies are upgraded, both `requirements.txt` and `requirements-dev.txt` should be regenerated so that they are compatible with each other and then synced with your virtual environment with: `pip-sync requirements-dev.txt requirements.txt`.
 
+Versions can be restricted from updating within the `pyproject.toml` using standard python package version specifiers, i.e. `"black<23"` or `"pip-tools!=6.12.2"`
+
 Dependabot is configured to update dependencies as new versions become available.
 
 [`pip-tools`]: https://pip-tools.readthedocs.io/en/latest/
