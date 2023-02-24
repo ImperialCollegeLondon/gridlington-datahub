@@ -52,11 +52,15 @@ mypy-extensions==1.0.0
     #   mypy
 nodeenv==1.7.0
     # via pre-commit
+numpy==1.24.2
+    # via pandas
 packaging==23.0
     # via
     #   black
     #   build
     #   pytest
+pandas==1.5.3
+    # via datahub (pyproject.toml)
 pathspec==0.11.0
     # via black
 pip-tools==6.12.2
@@ -89,8 +93,14 @@ pytest-mock==3.10.0
     # via datahub (pyproject.toml)
 pytest-mypy==0.10.3
     # via datahub (pyproject.toml)
+python-dateutil==2.8.2
+    # via pandas
+pytz==2022.7.1
+    # via pandas
 pyyaml==6.0
     # via pre-commit
+six==1.16.0
+    # via python-dateutil
 snowballstemmer==2.2.0
     # via pydocstyle
 tomli==2.0.1
