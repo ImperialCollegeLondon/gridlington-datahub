@@ -169,4 +169,5 @@ opal_data = [
 ]
 
 opal_df = pd.DataFrame(opal_data, columns=opal_header)
+
 print(opal_df)
