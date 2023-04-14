@@ -20,7 +20,8 @@ dev = [
     "pytest",
     "pytest-cov",
     "pytest-mypy",
-    "pytest-mock"
+    "pytest-mock",
+    "pandas-stubs"
 ]
 
 [tool.setuptools.packages.find]
