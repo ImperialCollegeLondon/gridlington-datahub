@@ -5,9 +5,7 @@
 #    pip-compile --extra=dev --output-file=requirements-dev.txt
 #
 attrs==22.2.0
-    # via
-    #   pytest
-    #   pytest-mypy
+    # via pytest-mypy
 black==23.3.0
     # via datahub (pyproject.toml)
 build==0.10.0
@@ -28,7 +26,7 @@ filelock==3.11.0
     # via
     #   pytest-mypy
     #   virtualenv
-identify==2.5.18
+identify==2.5.22
     # via pre-commit
 iniconfig==2.0.0
     # via pytest
@@ -42,7 +40,7 @@ mypy-extensions==1.0.0
     #   mypy
 nodeenv==1.7.0
     # via pre-commit
-packaging==23.0
+packaging==23.1
     # via
     #   black
     #   build
@@ -75,7 +73,7 @@ pytest-mypy==0.10.3
     # via datahub (pyproject.toml)
 pyyaml==6.0
     # via pre-commit
-ruff==0.0.257
+ruff==0.0.261
     # via datahub (pyproject.toml)
 tomli==2.0.1
     # via
