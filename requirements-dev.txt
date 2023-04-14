@@ -5,9 +5,7 @@
 #    pip-compile --extra=dev --output-file=requirements-dev.txt
 #
 attrs==22.2.0
-    # via
-    #   pytest
-    #   pytest-mypy
+    # via pytest-mypy
 black==23.3.0
     # via datahub (pyproject.toml)
 build==0.10.0
@@ -28,20 +26,10 @@ filelock==3.11.0
     # via
     #   pytest-mypy
     #   virtualenv
-flake8==6.0.0
-    # via
-    #   datahub (pyproject.toml)
-    #   flake8-docstrings
-flake8-docstrings==1.7.0
-    # via datahub (pyproject.toml)
 identify==2.5.22
     # via pre-commit
 iniconfig==2.0.0
     # via pytest
-isort==5.12.0
-    # via datahub (pyproject.toml)
-mccabe==0.7.0
-    # via flake8
 mypy==1.2.0
     # via
     #   datahub (pyproject.toml)
@@ -52,7 +40,7 @@ mypy-extensions==1.0.0
     #   mypy
 nodeenv==1.7.0
     # via pre-commit
-packaging==23.0
+packaging==23.1
     # via
     #   black
     #   build
@@ -69,12 +57,6 @@ pluggy==1.0.0
     # via pytest
 pre-commit==3.2.2
     # via datahub (pyproject.toml)
-pycodestyle==2.10.0
-    # via flake8
-pydocstyle==6.3.0
-    # via flake8-docstrings
-pyflakes==3.0.1
-    # via flake8
 pyproject-hooks==1.0.0
     # via build
 pytest==7.3.0
@@ -91,8 +73,8 @@ pytest-mypy==0.10.3
     # via datahub (pyproject.toml)
 pyyaml==6.0
     # via pre-commit
-snowballstemmer==2.2.0
-    # via pydocstyle
+ruff==0.0.261
+    # via datahub (pyproject.toml)
 tomli==2.0.1
     # via
     #   black
