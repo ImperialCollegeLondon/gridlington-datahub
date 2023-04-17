@@ -4,5 +4,29 @@
 #
 #    pip-compile
 #
-pandas==1.5.3
+defusedxml==0.7.1
+    # via odfpy
+et-xmlfile==1.1.0
+    # via openpyxl
+numpy==1.24.2
+    # via pandas
+odfpy==1.4.1
+    # via pandas
+openpyxl==3.1.2
+    # via pandas
+pandas[excel]==2.0.0
     # via datahub (pyproject.toml)
+python-dateutil==2.8.2
+    # via pandas
+pytz==2023.3
+    # via pandas
+pyxlsb==1.0.10
+    # via pandas
+six==1.16.0
+    # via python-dateutil
+tzdata==2023.3
+    # via pandas
+xlrd==2.0.1
+    # via pandas
+xlsxwriter==3.1.0
+    # via pandas
