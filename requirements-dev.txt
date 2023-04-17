@@ -45,6 +45,10 @@ packaging==23.1
     #   black
     #   build
     #   pytest
+pandas==1.5.3
+    # via datahub (pyproject.toml)
+pandas-stubs==2.0.0.230412.
+    # via datahub (pyproject.toml)
 pathspec==0.11.1
     # via black
 pip-tools==6.13.0
