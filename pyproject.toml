@@ -8,7 +8,7 @@ authors = [
     { name = "Imperial College London RSE Team", email = "ict-rse-team@imperial.ac.uk" }
 ]
 requires-python = ">=3.10"
-dependencies = []
+dependencies = ["pandas"]
 
 [project.optional-dependencies]
 dev = [
@@ -21,7 +21,6 @@ dev = [
     "pytest-cov",
     "pytest-mypy",
     "pytest-mock",
-    "pandas",
     "pandas-stubs"
 ]
 
