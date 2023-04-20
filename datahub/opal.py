@@ -1,4 +1,5 @@
 """This module defines the data structures for the Opal model."""
+
 import pandas as pd
 
 opal_header = [
@@ -49,7 +50,7 @@ opal_header = [
     "EV Status (Idle)",
 ]
 
-opal_data_1 = [
+opal_data = [
     1,
     8.58,
     34.9085,
@@ -97,55 +98,10 @@ opal_data_1 = [
     34,
 ]
 
-opal_data_2 = [
-    2,
-    16.11,
-    34.7576,
-    34.7548,
-    16.2635,
-    7.8821,
-    15.1365,
-    3.332,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    16279.2764,
-    16281.797,
-    -0.5729,
-    -1.0155,
-    16.2868,
-    8.9761,
-    0.2806,
-    -2.1394,
-    0,
-    0.7946,
-    0.052,
-    0.052,
-    34.687,
-    34.6842,
-    0,
-    0,
-    30.7926,
-    30.7926,
-    23,
-    5,
-    80,
-    173,
-    0,
-    311,
-    7170,
-    3.7148,
-    3.7148,
-    502,
-    2,
-    42,
-]
-
 
 def create_opal_frame() -> pd.DataFrame:
     """Function that creates pandas data frame for Opal data."""
-    return pd.DataFrame([opal_data_1, opal_data_2], columns=opal_header)
+    data = opal_data
+    data[1] = pd.Timedelta(seconds=data[1])
+
+    return pd.DataFrame(data, columns=opal_header)
