@@ -2,6 +2,8 @@
 
 import pandas as pd
 
+OPAL_START_DATE = "2035-01-22 00:00"
+
 opal_header = [
     "Data Frame",
     "Time",
