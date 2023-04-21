@@ -101,7 +101,7 @@ opal_data = [
 
 def create_opal_frame() -> pd.DataFrame:
     """Function that creates pandas data frame for Opal data."""
-    data: list[int | pd.Timestamp] = opal_data
+    data: list[float | pd.Timestamp] = opal_data
     data[1] = pd.Timestamp("2035-01-22 00:00") + pd.Timedelta(seconds=data[1])
 
     return pd.DataFrame(data, columns=opal_header)
