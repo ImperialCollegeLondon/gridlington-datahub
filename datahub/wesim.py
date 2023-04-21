@@ -1,5 +1,4 @@
 """This module defines the data structures for the WESIM model."""
-from typing import Dict, Union
 
 import pandas as pd
 
@@ -24,33 +23,18 @@ REGIONS_KEY = {
 
 # print(pd.concat([output, interconnectors], ignore_index=True).sort_values(by="Hour"))
 
-# columns = [
-#     "Technology",
-#     "Scotland",
-#     "North Eng&Wal",
-#     "Midlands",
-#     "London",
-#     "South Eng&Wal",
-# ]
-# data = [
-#     ["Onshore wind", 16472, 3297, 1062, 0, 3773],  # type: ignore[list-item]
-#     ["Offshore wind", 2770, 13744, 1427, 0, 17398],  # type: ignore[list-item]
-# ]
 
-# df = pd.DataFrame(data, columns=columns).set_index("Technology").transpose()
-
-
-# print(df)
-
-
-def read_wesim() -> Dict[Union[int, str], pd.DataFrame]:
+def read_wesim() -> dict[int | str, pd.DataFrame]:
     """Read the WESIM data from the excel file.
 
     Returns:
         pd.DataFrame: A Dictionary of DataFrames for each sheet in the file
     """
     return pd.read_excel(
-        "../1_Wesim_GB_hourly_data.xlsx", sheet_name=None, header=[3, 4], index_col=1
+        "../1_Wesim_GB_hourly_data.xlsx",
+        sheet_name=None,
+        header=[3, 4],
+        index_col=1,
     )
 
 
@@ -68,7 +52,7 @@ def structure_wesim(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         A structured DataFrame
     """
-    df.dropna(axis="columns", how="all")
+    df = df.dropna(axis="columns", how="all")
 
     df = df[
         [
@@ -94,6 +78,12 @@ def get_wesim() -> pd.DataFrame:
         The WESIM data
     """
     excel = read_wesim()
+
+    capacity = excel["Capacity"].dropna(axis="columns", how="all")
+    capacity = capacity[[col for col in capacity.columns if col[0] == "Region"]]
+    capacity = capacity.transpose()
+    capacity.index = capacity.index.droplevel(0)
+    capacity.index.name = "Region"
 
     return structure_wesim(excel["RES output"])
 
