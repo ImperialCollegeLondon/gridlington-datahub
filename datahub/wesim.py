@@ -3,25 +3,14 @@
 import pandas as pd
 
 REGIONS_KEY = {
-    "SCO": "Scotland",
-    "NEW": "North Engl&Wal",
-    "MID": "Midlands",
-    "LON": "London",
-    "SEW": "South Eng&Wal",
+    "Scotland": "SCO",
+    "North Engl&Wal": "NEW",
+    "Midlands": "MID",
+    "London": "LON",
+    "South Eng&Wal": "SEW",
 }
 
-# header = pd.MultiIndex.from_product(
-#     [["Interconnector"], ["SCO-IE", "NEW-NOR", "NEW-IE", "SEW-CE"]],
-# )
-
-# inter_data = [[491, -1238, 491, -1170], [491, -1022, 491, 1682]]
-# inter_df = pd.DataFrame(inter_data, columns=header)
-# print(inter_df)
-
-# interconnectors = inter_df.stack().reset_index(names=["Hour", "Region Code"])
-# print(interconnectors)
-
-# print(pd.concat([output, interconnectors], ignore_index=True).sort_values(by="Hour"))
+INTERCONNECTORS_KEY = {"SCO-IE", "NEW-NOR", "NEW-IE", "SEW-CE"}
 
 
 def read_wesim() -> dict[int | str, pd.DataFrame]:
@@ -58,13 +47,15 @@ def structure_wesim(df: pd.DataFrame) -> pd.DataFrame:
         [
             col
             for col in df.columns
-            if col[1] in set(REGIONS_KEY.keys()).union({"Total"})
+            if col[1]
+            in set(REGIONS_KEY.values()).union(INTERCONNECTORS_KEY).union({"Total"})
         ]
     ]
     stacked = df.stack()
 
     if isinstance(stacked, pd.DataFrame):
         df = stacked.reset_index(names=["Hour", "Region Code"])
+        df.columns.name = None
     else:
         raise ValueError("Could not process input WESIM data")
 
@@ -84,6 +75,25 @@ def get_wesim() -> pd.DataFrame:
     capacity = capacity.transpose()
     capacity.index = capacity.index.droplevel(0)
     capacity.index.name = "Region"
+    capacity = capacity.reset_index().replace({"Region": REGIONS_KEY})
+
+    print(capacity)
+
+    df = excel["Interconnector flows"].dropna(axis="columns", how="all")
+    interconnectors = df[df.columns[:5]]
+
+    interconnectors = structure_wesim(interconnectors)
+
+    print(interconnectors)
+
+    interconnector_capacity = df[["Code", "Capacity (MW)"]].dropna().T.reset_index().T
+    interconnector_capacity.rename(
+        columns=dict(
+            zip(interconnector_capacity.columns, interconnector_capacity.iloc[0])
+        )
+    )
+    interconnector_capacity = interconnector_capacity.iloc[1:].reset_index(drop=True)
+    print(interconnector_capacity)
 
     return structure_wesim(excel["RES output"])
 
