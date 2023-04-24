@@ -52,54 +52,6 @@ opal_header = [
     "EV Status (Idle)",
 ]
 
-opal_data = [
-    1,
-    8.58,
-    34.9085,
-    34.9055,
-    16.177,
-    7.8868,
-    15.1744,
-    3.3549,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    16192.8871,
-    16194.8348,
-    -0.5713,
-    -0.8467,
-    16.2002,
-    9.0618,
-    0.2806,
-    -2.1328,
-    0,
-    0.7931,
-    0.0522,
-    0.0522,
-    34.8373,
-    34.8343,
-    0,
-    0,
-    30.801,
-    30.801,
-    28,
-    5,
-    63,
-    72,
-    0,
-    303,
-    7230,
-    3.774,
-    3.774,
-    510,
-    2,
-    34,
-]
-
 
 def create_opal_frame() -> pd.DataFrame:
     """Function that creates the initial pandas data frame for Opal data."""
@@ -109,9 +61,9 @@ def create_opal_frame() -> pd.DataFrame:
     return df
 
 
-def append_opal_frame() -> pd.DataFrame:
+def append_opal_frame(data: list[float]) -> pd.DataFrame:
     """Function that creates pandas data frame for Opal data to be appended."""
-    df = pd.DataFrame([opal_data], columns=opal_header)
+    df = pd.DataFrame([data], columns=opal_header)
     df["Time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(df["Time"], unit="S")
 
     return df
