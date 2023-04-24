@@ -102,7 +102,7 @@ opal_data = [
 
 
 def create_opal_frame() -> pd.DataFrame:
-    """Function that creates pandas data frame for Opal data."""
+    """Function that creates the initial pandas data frame for Opal data."""
     df = pd.DataFrame(0, index=range(1), columns=opal_header)
     df["Time"] = pd.Timestamp(OPAL_START_DATE)
 
@@ -110,7 +110,7 @@ def create_opal_frame() -> pd.DataFrame:
 
 
 def append_opal_frame() -> pd.DataFrame:
-    """Function that creates pandas data frame for Opal data."""
+    """Function that creates pandas data frame for Opal data to be appended."""
     df = pd.DataFrame([opal_data], columns=opal_header)
     df["Time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(df["Time"], unit="S")
 
