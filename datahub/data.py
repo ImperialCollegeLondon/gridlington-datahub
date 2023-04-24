@@ -1,7 +1,11 @@
 """This module defines the data structures for each of the models."""
-from .opal import create_opal_frame
+import opal
+import pandas as pd
 
 if __name__ == "__main__":
-    opal_df = create_opal_frame()
+    opal_df = opal.create_opal_frame()
+    print("Initial ---")
     print(opal_df)
-    print(type(opal_df))
+    opal_df = pd.concat([opal_df, opal.append_opal_frame()])
+    print("Append ---")
+    print(opal_df)
