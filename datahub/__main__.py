@@ -3,8 +3,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-# from datahub.data import Opal
-
 app = FastAPI()
 
 
