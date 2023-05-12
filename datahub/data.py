@@ -51,10 +51,28 @@ opal_data = [
     34,
 ]
 
+
+@pd.api.extensions.register_dataframe_accessor("opal")
+class OpalAccessor:
+    """Pandas custom accessor for appending new data to Opal dataframe."""
+
+    def __init__(self, pandas_obj: pd.DataFrame) -> None:
+        """Initialization of dataframe. Validation to be added."""
+        self._obj = pandas_obj
+
+    def append(self, data: dict[str, float]) -> None:
+        """Function to append new data to existing dataframe."""
+        concat_df = pd.concat([self._obj, append_opal_frame(data)])
+        self._obj = concat_df
+
+
+opal_df = create_opal_frame()
+
+
 if __name__ == "__main__":
     opal_df = create_opal_frame()
     print("Initial ---")
     print(opal_df)
-    opal_df = pd.concat([opal_df, append_opal_frame(opal_data)])
-    print("Append ---")
-    print(opal_df)
+    # opal_df = pd.concat([opal_df, append_opal_frame(opal_data)])
+    # print("Append ---")
+    # print(opal_df)

@@ -52,6 +52,54 @@ opal_header = [
     "EV Status (Idle)",
 ]
 
+key_headers = [
+    "frame",
+    "time",
+    "total_gen",
+    "total_dem",
+    "total_offwind",
+    "N/A",
+    "N/A",
+    "N/A",
+    "intra_trade",
+    "intra_gen",
+    "intra_dem",
+    "intra_sto",
+    "bm_gen",
+    "bm_sto",
+    "bm_dem",
+    "offwind_exp",
+    "offwind_real",
+    "bat_gen",
+    "inter_gen",
+    "offwind_gen",
+    "onwind_gen",
+    "other_gen",
+    "pump_gen",
+    "pv_gen",
+    "nc_gen",
+    "hyd_gen",
+    "gas_gen",
+    "total_exp",
+    "total_real",
+    "bm_cost",
+    "bm_accept",
+    "exp_dem",
+    "real_dem",
+    "act_work",
+    "act_study",
+    "act_home",
+    "act_pers",
+    "act_shop",
+    "act_leis",
+    "act_sleep",
+    "exp_ev",
+    "real_ev",
+    "ev_charge",
+    "ev_travel",
+    "ev_idle",
+]
+
 
 def create_opal_frame() -> pd.DataFrame:
     """Function that creates the initial pandas data frame for Opal data."""
@@ -61,9 +109,17 @@ def create_opal_frame() -> pd.DataFrame:
     return df
 
 
-def append_opal_frame(data: list[float]) -> pd.DataFrame:
+def append_opal_frame(data: dict[str, float]) -> pd.DataFrame:
     """Function that creates pandas data frame for Opal data to be appended."""
-    df = pd.DataFrame([data], columns=opal_header)
+    data_array = []
+
+    for item in key_headers:
+        if item in data:
+            data_array.append(data[item])
+        elif item == "N/A":
+            data_array.append(0)
+
+    df = pd.DataFrame([data_array], columns=opal_header)
     df["Time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(df["Time"], unit="S")
 
     return df
