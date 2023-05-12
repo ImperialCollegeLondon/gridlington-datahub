@@ -11,6 +11,7 @@ REGIONS_KEY = {
 }
 
 INTERCONNECTORS_KEY = {"SCO-IE", "NEW-NOR", "NEW-IE", "SEW-CE"}
+WESIM_DATA_FILE = "../1_Wesim_GB_hourly_data.xlsx"  # TODO: move to config
 
 
 def read_wesim() -> dict[int | str, pd.DataFrame]:
@@ -20,7 +21,7 @@ def read_wesim() -> dict[int | str, pd.DataFrame]:
         pd.DataFrame: A Dictionary of DataFrames for each sheet in the file
     """
     excel = pd.read_excel(
-        "../1_Wesim_GB_hourly_data.xlsx",
+        WESIM_DATA_FILE,
         sheet_name=None,
         header=[3, 4],
         index_col=1,
