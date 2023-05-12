@@ -22,6 +22,8 @@ distlib==0.3.6
     # via virtualenv
 exceptiongroup==1.1.1
     # via pytest
+fastapi==0.95.1
+    # via datahub (pyproject.toml)
 filelock==3.11.0
     # via
     #   pytest-mypy
@@ -60,6 +62,8 @@ platformdirs==3.2.0
 pluggy==1.0.0
     # via pytest
 pre-commit==3.2.2
+    # via datahub (pyproject.toml)
+pydantic==1.10.7
     # via datahub (pyproject.toml)
 pyproject-hooks==1.0.0
     # via build
