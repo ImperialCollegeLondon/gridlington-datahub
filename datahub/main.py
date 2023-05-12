@@ -3,58 +3,9 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from . import data as dt
+
 app = FastAPI()
-
-
-# opal = Opal()
-
-opal_array = [
-    "frame",
-    "time",
-    "total_gen",
-    "total_dem",
-    "total_offwind",
-    "N/A",
-    "N/A",
-    "N/A",
-    "intra_trade",
-    "intra_gen",
-    "intra_dem",
-    "intra_sto",
-    "bm_gen",
-    "bm_sto",
-    "bm_dem",
-    "offwind_exp",
-    "offwind_real",
-    "bat_gen",
-    "inter_gen",
-    "offwind_gen",
-    "onwind_gen",
-    "other_gen",
-    "pump_gen",
-    "pv_gen",
-    "nc_gen",
-    "hyd_gen",
-    "gas_gen",
-    "total_exp",
-    "total_real",
-    "bm_cost",
-    "bm_accept",
-    "exp_dem",
-    "real_dem",
-    "act_work",
-    "act_study",
-    "act_home",
-    "act_pers",
-    "act_shop",
-    "act_leis",
-    "act_sleep",
-    "exp_ev",
-    "real_ev",
-    "ev_charge",
-    "ev_travel",
-    "ev_idle",
-]
 
 
 class OpalData(BaseModel):
@@ -105,7 +56,7 @@ class OpalData(BaseModel):
 
 
 @app.post("/opal")
-def create_data(data: OpalData) -> dict[str, list[float]]:
+def create_data(data: OpalData) -> dict[str, float]:
     """Post method function for appending data to Opal dataframe."""
     raw_data = {
         "frame": data.frame,
@@ -152,15 +103,8 @@ def create_data(data: OpalData) -> dict[str, list[float]]:
         "ev_idle": data.ev_idle,
     }
 
-    array = []
+    print(dt.opal_df)
+    dt.opal_df.opal.append(raw_data)
+    print(dt.opal_df)
 
-    for item in opal_array:
-        if item in raw_data:
-            array.append(raw_data[item])
-        elif item == "N/A":
-            array.append(0)
-
-    # opal.append(array)
-    # opal.print()
-
-    return {"array": array}
+    return raw_data
