@@ -57,7 +57,14 @@ class OpalData(BaseModel):
 
 @app.post("/opal")
 def create_data(data: OpalData) -> dict[str, float]:
-    """Post method function for appending data to Opal dataframe."""
+    """Post method function for appending data to Opal dataframe.
+
+    Args:
+        data: The raw opal data
+
+    Returns:
+        A Dict of the Opal data that has just been added to the Dataframe
+    """
     raw_data = {
         "frame": data.frame,
         "time": data.time,

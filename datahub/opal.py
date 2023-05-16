@@ -5,7 +5,6 @@ import pandas as pd
 OPAL_START_DATE = "2035-01-22 00:00"
 
 opal_header = [
-    "Data Frame",
     "Time",
     "Total Generation",
     "Total Demand",
@@ -53,7 +52,6 @@ opal_header = [
 ]
 
 key_headers = [
-    "frame",
     "time",
     "total_gen",
     "total_dem",
@@ -102,15 +100,26 @@ key_headers = [
 
 
 def create_opal_frame() -> pd.DataFrame:
-    """Function that creates the initial pandas data frame for Opal data."""
+    """Function that creates the initial pandas data frame for Opal data.
+
+    Returns:
+        An initial Dataframe for the opal data with key frame 0
+    """
     df = pd.DataFrame(0, index=range(1), columns=opal_header)
     df["Time"] = pd.Timestamp(OPAL_START_DATE)
 
     return df
 
 
-def append_opal_frame(data: dict[str, float]) -> pd.DataFrame:
-    """Function that creates pandas data frame for Opal data to be appended."""
+def get_opal_row(data: dict[str, float]) -> pd.Series:  # type: ignore[type-arg]
+    """Function that creates a new row of Opal data to be appended.
+
+    Args:
+        data: The raw opal data posted to the API
+
+    Returns:
+        A pandas Series containing the new data
+    """
     data_array = []
 
     for item in key_headers:
@@ -119,7 +128,7 @@ def append_opal_frame(data: dict[str, float]) -> pd.DataFrame:
         elif item == "N/A":
             data_array.append(0)
 
-    df = pd.DataFrame([data_array], columns=opal_header)
-    df["Time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(df["Time"], unit="S")
+    row = pd.Series(data_array, name=data["frame"], index=opal_header)
+    row["Time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(row["Time"], unit="S")
 
-    return df
+    return row
