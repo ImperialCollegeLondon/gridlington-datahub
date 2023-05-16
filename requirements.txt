@@ -8,6 +8,8 @@ defusedxml==0.7.1
     # via odfpy
 et-xmlfile==1.1.0
     # via openpyxl
+fastapi==0.95.1
+    # via datahub (pyproject.toml)
 numpy==1.24.2
     # via pandas
 odfpy==1.4.1
@@ -15,6 +17,8 @@ odfpy==1.4.1
 openpyxl==3.1.2
     # via pandas
 pandas[excel]==2.0.0
+    # via datahub (pyproject.toml)
+pydantic==1.10.7
     # via datahub (pyproject.toml)
 python-dateutil==2.8.2
     # via pandas
