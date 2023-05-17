@@ -8,7 +8,11 @@ authors = [
     { name = "Imperial College London RSE Team", email = "ict-rse-team@imperial.ac.uk" }
 ]
 requires-python = ">=3.10"
-dependencies = ["pandas[excel]"]
+dependencies = [
+    "pandas[excel]",
+    "fastapi",
+    "uvicorn"
+]
 
 [project.optional-dependencies]
 dev = [
@@ -31,7 +35,6 @@ exclude = ["htmlcov"]
 disallow_any_explicit = true
 disallow_any_generics = true
 warn_unreachable = true
-warn_unused_ignores = true
 disallow_untyped_defs = true
 exclude = [".venv/"]
 
