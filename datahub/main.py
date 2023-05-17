@@ -110,6 +110,7 @@ def create_data(data: OpalData) -> dict[str, float]:
         "ev_idle": data.ev_idle,
     }
 
+    # TODO: Change print statements to more formal logging
     print(dt.opal_df)
     dt.opal_df.opal.append(raw_data)
     print(dt.opal_df)

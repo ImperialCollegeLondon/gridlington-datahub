@@ -1,5 +1,4 @@
 """This module defines the data structures for the Opal model."""
-
 import pandas as pd
 
 OPAL_START_DATE = "2035-01-22 00:00"
@@ -97,6 +96,27 @@ key_headers = [
     "ev_travel",
     "ev_idle",
 ]
+
+
+@pd.api.extensions.register_dataframe_accessor("opal")
+class OpalAccessor:
+    """Pandas custom accessor for appending new data to Opal dataframe."""
+
+    def __init__(self, pandas_obj: pd.DataFrame) -> None:
+        """Initialization of dataframe.
+
+        TODO: Add validation function.
+        """
+        self._obj = pandas_obj
+
+    def append(self, data: dict[str, float]) -> None:
+        """Function to append new data to existing dataframe.
+
+        Args:
+            data: The raw opal data posted to the API
+        """
+        row = get_opal_row(data)
+        self._obj.loc[data["frame"]] = row  # type: ignore[call-overload]
 
 
 def create_opal_frame() -> pd.DataFrame:

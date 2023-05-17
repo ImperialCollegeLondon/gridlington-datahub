@@ -1,7 +1,5 @@
 """This module defines the data structures for each of the models."""
-import pandas as pd
-
-from .opal import create_opal_frame, get_opal_row
+from .opal import create_opal_frame
 
 opal_data = [
     1,
@@ -50,27 +48,6 @@ opal_data = [
     2,
     34,
 ]
-
-
-@pd.api.extensions.register_dataframe_accessor("opal")
-class OpalAccessor:
-    """Pandas custom accessor for appending new data to Opal dataframe."""
-
-    def __init__(self, pandas_obj: pd.DataFrame) -> None:
-        """Initialization of dataframe.
-
-        TODO: Add validation function.
-        """
-        self._obj = pandas_obj
-
-    def append(self, data: dict[str, float]) -> None:
-        """Function to append new data to existing dataframe.
-
-        Args:
-            data: The raw opal data posted to the API
-        """
-        row = get_opal_row(data)
-        self._obj.loc[data["frame"]] = row  # type: ignore[call-overload]
 
 
 opal_df = create_opal_frame()
