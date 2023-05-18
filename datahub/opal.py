@@ -8,9 +8,6 @@ opal_header = [
     "Total Generation",
     "Total Demand",
     "Total Offshore Generation",
-    "N/A",
-    "N/A",
-    "N/A",
     "Intra-day Market Value",
     "Intra-day Market Generation",
     "Intra-day Market Demand",
@@ -145,8 +142,6 @@ def get_opal_row(data: dict[str, float]) -> pd.Series:  # type: ignore[type-arg]
     for item in key_headers:
         if item in data:
             data_array.append(data[item])
-        elif item == "N/A":
-            data_array.append(0)
 
     row = pd.Series(data_array, name=data["frame"], index=opal_header)
     row["Time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(row["Time"], unit="S")
