@@ -62,8 +62,8 @@ class OpalArrayData(BaseModel):
 
 
 @app.post("/opal")
-def create_data(data: OpalDictData | OpalArrayData) -> dict[str, float]:
-    """Post method function for appending data to Opal dataframe.
+def create_opal_data(data: OpalDictData | OpalArrayData) -> dict[str, float]:
+    """POST method function for appending data to Opal Dataframe.
 
     Args:
         data: The raw opal data in either Dict or List format
@@ -94,3 +94,15 @@ def create_data(data: OpalDictData | OpalArrayData) -> dict[str, float]:
     print(dt.opal_df)
 
     return raw_data
+
+
+@app.get("/opal")
+def get_opal_data() -> dict[str, float]:
+    """GET method function for getting Opal Dataframe as JSON.
+
+    Returns:
+        A Dict of the Opal Dataframe in JSON format
+    """
+    # Requires opal-test branch to be merged
+    # return dt.opal_df.to_json()
+    return {"test": 0}
