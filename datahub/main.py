@@ -1,6 +1,6 @@
 """Script for running Datahub API."""
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 from . import data as dt
@@ -8,8 +8,8 @@ from . import data as dt
 app = FastAPI()
 
 
-class OpalData(BaseModel):
-    """Class for defining required key values for Opal data."""
+class OpalDictData(BaseModel):
+    """Class for defining required key values for Opal data as a dict."""
 
     frame: int
     time: float
@@ -55,60 +55,38 @@ class OpalData(BaseModel):
     ev_idle: int
 
 
+class OpalArrayData(BaseModel):
+    """Class for defining required key values for Opal data as an array."""
+
+    array: list[float]
+
+
 @app.post("/opal")
-def create_data(data: OpalData) -> dict[str, float]:
+def create_data(data: OpalDictData | OpalArrayData) -> dict[str, float]:
     """Post method function for appending data to Opal dataframe.
 
     Args:
-        data: The raw opal data
+        data: The raw opal data in either Dict or List format
 
     Returns:
         A Dict of the Opal data that has just been added to the Dataframe
     """
-    raw_data = {
-        "frame": data.frame,
-        "time": data.time,
-        "total_gen": data.total_gen,
-        "total_dem": data.total_dem,
-        "total_offwind": data.total_offwind,
-        "intra_trade": data.intra_trade,
-        "intra_gen": data.intra_gen,
-        "intra_dem": data.intra_dem,
-        "intra_sto": data.intra_sto,
-        "bm_gen": data.bm_gen,
-        "bm_sto": data.bm_sto,
-        "bm_dem": data.bm_dem,
-        "offwind_exp": data.offwind_exp,
-        "offwind_real": data.offwind_real,
-        "bat_gen": data.bat_gen,
-        "inter_gen": data.inter_gen,
-        "offwind_gen": data.offwind_gen,
-        "onwind_gen": data.onwind_gen,
-        "other_gen": data.other_gen,
-        "pump_gen": data.pump_gen,
-        "pv_gen": data.pv_gen,
-        "nc_gen": data.nc_gen,
-        "hyd_gen": data.hyd_gen,
-        "gas_gen": data.gas_gen,
-        "total_exp": data.total_exp,
-        "total_real": data.total_real,
-        "bm_cost": data.bm_cost,
-        "bm_accept": data.bm_accept,
-        "exp_dem": data.exp_dem,
-        "real_dem": data.real_dem,
-        "act_work": data.act_work,
-        "act_study": data.act_study,
-        "act_home": data.act_home,
-        "act_pers": data.act_pers,
-        "act_shop": data.act_shop,
-        "act_leis": data.act_leis,
-        "act_sleep": data.act_sleep,
-        "exp_ev": data.exp_ev,
-        "real_ev": data.real_ev,
-        "ev_charge": data.ev_charge,
-        "ev_travel": data.ev_travel,
-        "ev_idle": data.ev_idle,
-    }
+    dict_data = dict(data)
+    raw_data = {}
+
+    array_keys = list(OpalDictData.__fields__.keys())
+    array_keys[5:5] = ["na", "na", "na"]
+
+    if "array" in dict_data:
+        if not len(dict_data["array"]) == 45:
+            raise HTTPException(
+                status_code=400, detail="Array has invalid length. Expecting 45 items."
+            )
+        for x in range(45):
+            if not array_keys[x] == "na":
+                raw_data[array_keys[x]] = dict_data["array"][x]
+    else:
+        raw_data = dict_data
 
     # TODO: Change print statements to more formal logging
     print(dt.opal_df)
