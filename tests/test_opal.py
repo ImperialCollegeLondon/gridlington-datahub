@@ -1,11 +1,5 @@
 import pandas as pd
 
-from .opal_dummy_data import data_1, data_2, data_3
-
-keys = []
-for key in data_1:
-    keys.append(key)
-
 
 def test_create_opal_frame():
     """Tests creation of blank Opal Dataframes."""
@@ -28,9 +22,18 @@ def test_create_opal_frame():
     assert all(v == 0 for v in float_data)
 
 
-def test_append_opal_data():
+def test_append_opal_data(opal_data):
     """Tests appending new row of Opal data to Dataframe using custom accessor."""
     from datahub.opal import OPAL_START_DATE, create_opal_frame
+
+    data_1 = opal_data.copy()
+
+    data_2 = opal_data.copy()
+    data_2["frame"] = 2
+    data_2["time"] = data_2["time"] + 7
+
+    data_3 = data_2.copy()
+    data_3["time"] = data_3["time"] + 7
 
     df = create_opal_frame()
 
@@ -43,33 +46,22 @@ def test_append_opal_data():
     assert len(df.index) == 3
 
     """Checks that data appended to Dataframe matches data input."""
-    for x in range(1, 42):
-        if x == 1:
-            value_1 = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(
-                data_1[keys[x]], unit="S"
-            )
-            value_2 = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(
-                data_2[keys[x]], unit="S"
-            )
-        else:
-            value_1 = data_1[keys[x]]
-            value_2 = data_2[keys[x]]
+    data_1["time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(
+        data_1["time"], unit="S"
+    )
+    data_2["time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(
+        data_2["time"], unit="S"
+    )
 
-        assert df.iloc[1][x - 1] == value_1
-        assert df.iloc[2][x - 1] == value_2
+    assert (df.iloc[1, :] == list(data_1.values())[1:]).all()
+    assert (df.iloc[2, :] == list(data_2.values())[1:]).all()
 
     """Checks that data overwrites existing rows if they have the same index value."""
     df.opal.append(data_3)
-
-    assert len(df.columns) == 41
     assert len(df.index) == 3
 
-    for x in range(1, 42):
-        if x == 1:
-            value = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(
-                data_3[keys[x]], unit="S"
-            )
-        else:
-            value = data_3[keys[x]]
+    data_3["time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(
+        data_3["time"], unit="S"
+    )
 
-        assert df.iloc[2][x - 1] == value
+    assert (df.iloc[2, :] == list(data_3.values())[1:]).all()
