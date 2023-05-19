@@ -1,5 +1,11 @@
 import pandas as pd
 
+from .opal_dummy_data import data_1, data_2, data_3
+
+keys = []
+for key in data_1:
+    keys.append(key)
+
 
 def test_create_opal_frame():
     """Tests creation of blank Opal Dataframes."""
@@ -28,68 +34,42 @@ def test_append_opal_data():
 
     df = create_opal_frame()
 
-    data = {
-        "frame": 1,
-        "time": 8.58,
-        "total_gen": 34.9085,
-        "total_dem": 34.9055,
-        "total_offwind": 16.177,
-        "intra_trade": 0,
-        "intra_gen": 0,
-        "intra_dem": 0,
-        "intra_sto": 0,
-        "bm_gen": 0,
-        "bm_sto": 0,
-        "bm_dem": 0,
-        "offwind_exp": 16192.89,
-        "offwind_real": 16194.83,
-        "bat_gen": -0.5713,
-        "inter_gen": -0.8467,
-        "offwind_gen": 16.2002,
-        "onwind_gen": 9.0618,
-        "other_gen": 0.2806,
-        "pump_gen": -2.1328,
-        "pv_gen": 0,
-        "nc_gen": 0.7931,
-        "hyd_gen": 0.0522,
-        "gas_gen": 0.0522,
-        "total_exp": 34.8373,
-        "total_real": 34.8343,
-        "bm_cost": 0,
-        "bm_accept": 0,
-        "exp_dem": 30.801,
-        "real_dem": 30.801,
-        "act_work": 28,
-        "act_study": 5,
-        "act_home": 63,
-        "act_pers": 72,
-        "act_shop": 0,
-        "act_leis": 303,
-        "act_sleep": 7230,
-        "exp_ev": 3.774,
-        "real_ev": 3.774,
-        "ev_charge": 510,
-        "ev_travel": 2,
-        "ev_idle": 34,
-    }
-
-    df.opal.append(data)
-
-    """Checks that Dataframe has 41 columns and 2 rows."""
+    """Checks that Dataframe has an additonal row each time .append is used."""
+    df.opal.append(data_1)
     assert len(df.columns) == 41
     assert len(df.index) == 2
 
+    df.opal.append(data_2)
+    assert len(df.index) == 3
+
     """Checks that data appended to Dataframe matches data input."""
-    keys = []
-    for key in data:
-        keys.append(key)
+    for x in range(1, 42):
+        if x == 1:
+            value_1 = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(
+                data_1[keys[x]], unit="S"
+            )
+            value_2 = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(
+                data_2[keys[x]], unit="S"
+            )
+        else:
+            value_1 = data_1[keys[x]]
+            value_2 = data_2[keys[x]]
+
+        assert df.iloc[1][x - 1] == value_1
+        assert df.iloc[2][x - 1] == value_2
+
+    """Checks that data overwrites existing rows if they have the same index value."""
+    df.opal.append(data_3)
+
+    assert len(df.columns) == 41
+    assert len(df.index) == 3
 
     for x in range(1, 42):
         if x == 1:
             value = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(
-                data[keys[x]], unit="S"
+                data_3[keys[x]], unit="S"
             )
         else:
-            value = data[keys[x]]
+            value = data_3[keys[x]]
 
-        assert df.iloc[1][x - 1] == value
+        assert df.iloc[2][x - 1] == value
