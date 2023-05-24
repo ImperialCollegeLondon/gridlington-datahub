@@ -92,7 +92,7 @@ def get_opal_row(data: dict[str, float]) -> pd.Series:  # type: ignore[type-arg]
     """
     data_array = []
 
-    for item in list(opal_headers.values()):
+    for item in opal_headers.values():
         if item in data:
             data_array.append(data[item])
 
