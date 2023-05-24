@@ -1,4 +1,6 @@
 """This module defines the data structures for the Opal model."""
+from typing import Any
+
 import pandas as pd
 
 OPAL_START_DATE = "2035-01-22 00:00"
@@ -59,14 +61,18 @@ class OpalAccessor:
         """
         self._obj = pandas_obj
 
-    def append(self, data: dict[str, float]) -> None:
+    def append(self, data: dict[str, Any]) -> None:  # type: ignore[misc]
         """Function to append new data to existing dataframe.
 
         Args:
             data: The raw opal data posted to the API
         """
         row = get_opal_row(data)
-        self._obj.loc[data["frame"]] = row  # type: ignore[call-overload]
+        if "array" in data:
+            data_index = data["array"][0]
+        else:
+            data_index = data["frame"]
+        self._obj.loc[data_index] = row  # type: ignore[call-overload]
 
 
 def create_opal_frame() -> pd.DataFrame:
@@ -81,7 +87,7 @@ def create_opal_frame() -> pd.DataFrame:
     return df
 
 
-def get_opal_row(data: dict[str, float]) -> pd.Series:  # type: ignore[type-arg]
+def get_opal_row(data: dict[str, Any]) -> pd.Series:  # type: ignore[type-arg, misc]
     """Function that creates a new row of Opal data to be appended.
 
     Args:
@@ -90,13 +96,23 @@ def get_opal_row(data: dict[str, float]) -> pd.Series:  # type: ignore[type-arg]
     Returns:
         A pandas Series containing the new data
     """
-    data_array = []
+    if "array" not in data:
+        data_index = data["frame"]
 
-    for item in opal_headers.values():
-        if item in data:
-            data_array.append(data[item])
+        data_array = []
 
-    row = pd.Series(data_array, name=data["frame"], index=list(opal_headers.keys()))
+        for item in opal_headers.values():
+            if item in data:
+                data_array.append(data[item])
+    else:
+        data_index = data["array"][0]
+
+        data_array = data["array"]
+
+        del data_array[5:8]
+        del data_array[0]
+
+    row = pd.Series(data_array, name=data_index, index=list(opal_headers.keys()))
     row["Time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(row["Time"], unit="S")
 
     return row
