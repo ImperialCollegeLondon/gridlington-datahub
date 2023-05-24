@@ -62,7 +62,7 @@ class OpalArrayData(BaseModel):
 
 
 @app.post("/opal")
-def create_opal_data(data: OpalDictData | OpalArrayData) -> dict[str, float]:
+def create_opal_data(data: OpalDictData | OpalArrayData) -> dict[str, str]:
     """POST method function for appending data to Opal Dataframe.
 
     Args:
@@ -71,29 +71,21 @@ def create_opal_data(data: OpalDictData | OpalArrayData) -> dict[str, float]:
     Returns:
         A Dict of the Opal data that has just been added to the Dataframe
     """
-    dict_data = dict(data)
-    raw_data = {}
-
-    array_keys = list(OpalDictData.__fields__.keys())
-    array_keys[5:5] = ["na", "na", "na"]
-
-    if "array" in dict_data:
-        if not len(dict_data["array"]) == 45:
-            raise HTTPException(
-                status_code=400, detail="Array has invalid length. Expecting 45 items."
-            )
-        for x in range(45):
-            if not array_keys[x] == "na":
-                raw_data[array_keys[x]] = dict_data["array"][x]
-    else:
-        raw_data = dict_data
+    raw_data = data.dict()
 
     # TODO: Change print statements to more formal logging
     print(dt.opal_df)
+
+    if isinstance(data, OpalArrayData) and not len(raw_data["array"]) == 45:
+        raise HTTPException(
+            status_code=400, detail="Array has invalid length. Expecting 45 items."
+        )
+
     dt.opal_df.opal.append(raw_data)
+
     print(dt.opal_df)
 
-    return raw_data
+    return {"message": "Data submitted successfully."}
 
 
 @app.get("/opal")
