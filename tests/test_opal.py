@@ -65,3 +65,24 @@ def test_append_opal_data(opal_data):
     )
 
     assert (df.iloc[2, :] == list(data_3.values())[1:]).all()
+
+
+def test_append_opal_data_array(opal_data_array):
+    """Tests appending new row of Opal data using array format."""
+    from datahub.opal import OPAL_START_DATE, create_opal_frame
+
+    data_1 = opal_data_array.copy()
+
+    df = create_opal_frame()
+
+    """Checks that Dataframe is appended to correctly with array format data."""
+    df.opal.append(data_1)
+
+    assert len(df.columns) == 41
+    assert len(df.index) == 2
+
+    del data_1[5:8]
+    del data_1[0]
+    data_1[0] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(data_1[0], unit="S")
+
+    assert (df.iloc[1, :] == data_1[0:]).all()
