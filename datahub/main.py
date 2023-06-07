@@ -1,4 +1,5 @@
 """Script for running Datahub API."""
+from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -93,13 +94,15 @@ def create_opal_data(data: OpalDictData | OpalArrayData) -> dict[str, str]:
     return {"message": "Data submitted successfully."}
 
 
+# TODO: Fix return typing annotation
 @app.get("/opal")
-def get_opal_data() -> dict[str, float]:
+def get_opal_data() -> dict[str, Any]:  # type: ignore[misc]
     """GET method function for getting Opal Dataframe as JSON.
 
     Returns:
         A Dict of the Opal Dataframe in JSON format
     """
-    # Requires opal-test branch to be merged
-    # return dt.opal_df.to_json()
-    return {"test": 0}
+    data = dt.opal_df.to_dict()
+    # can be converted back to DF with pd.DataFrame.from_dict(data)
+
+    return data
