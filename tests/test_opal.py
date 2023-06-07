@@ -81,5 +81,8 @@ def test_append_opal_data_array(opal_data_array):
     assert len(df.columns) == 41
     assert len(df.index) == 2
 
+    del data_1[5:8]
+    del data_1[0]
     data_1[0] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(data_1[0], unit="S")
+
     assert (df.iloc[1, :] == data_1[0:]).all()
