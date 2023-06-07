@@ -1,5 +1,4 @@
 """This module defines the data structures for the Opal model."""
-from typing import Any
 
 import pandas as pd
 
@@ -61,15 +60,15 @@ class OpalAccessor:
         """
         self._obj = pandas_obj
 
-    def append(self, data: dict[str, Any]) -> None:  # type: ignore[misc]
+    def append(self, data: dict[str, float] | list[float]) -> None:
         """Function to append new data to existing dataframe.
 
         Args:
             data: The raw opal data posted to the API
         """
         row = get_opal_row(data)
-        if "array" in data:
-            data_index = data["array"][0]
+        if isinstance(data, list):
+            data_index = data[0]
         else:
             data_index = data["frame"]
         self._obj.loc[data_index] = row  # type: ignore[call-overload]
@@ -87,7 +86,9 @@ def create_opal_frame() -> pd.DataFrame:
     return df
 
 
-def get_opal_row(data: dict[str, Any]) -> pd.Series:  # type: ignore[type-arg, misc]
+def get_opal_row(
+    data: dict[str, float] | list[float]
+) -> pd.Series:  # type: ignore[type-arg]
     """Function that creates a new row of Opal data to be appended.
 
     Args:
@@ -96,18 +97,13 @@ def get_opal_row(data: dict[str, Any]) -> pd.Series:  # type: ignore[type-arg, m
     Returns:
         A pandas Series containing the new data
     """
-    if "array" not in data:
+    if isinstance(data, dict):
         data_index = data["frame"]
+        data_array = [data[item] for item in opal_headers.values()]
 
-        data_array = []
-
-        for item in opal_headers.values():
-            if item in data:
-                data_array.append(data[item])
     else:
-        data_index = data["array"][0]
-
-        data_array = data["array"]
+        data_array = data
+        data_index = data_array[0]
 
         del data_array[5:8]
         del data_array[0]

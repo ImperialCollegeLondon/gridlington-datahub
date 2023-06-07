@@ -18,8 +18,7 @@ def opal_data():
 @pytest.fixture
 def opal_data_array():
     """Pytest Fixture for random Opal data input in array format."""
-    data = {}
-    data["array"] = [1, 8.58]
+    data = [1, 8.58]
     for x in range(43):
-        data["array"].append(random.random() * random.choice([10, 100]))
+        data.append(random.random() * random.choice([10, 100]))
     return data

@@ -73,15 +73,20 @@ def create_opal_data(data: OpalDictData | OpalArrayData) -> dict[str, str]:
     """
     raw_data = data.dict()
 
+    if isinstance(data, OpalArrayData):
+        append_input = raw_data["array"]
+    else:
+        append_input = raw_data
+
     # TODO: Change print statements to more formal logging
     print(dt.opal_df)
 
-    if isinstance(data, OpalArrayData) and not len(raw_data["array"]) == 45:
+    if isinstance(append_input, list) and not len(append_input) == 45:
         raise HTTPException(
             status_code=400, detail="Array has invalid length. Expecting 45 items."
         )
 
-    dt.opal_df.opal.append(raw_data)
+    dt.opal_df.opal.append(append_input)
 
     print(dt.opal_df)
 
