@@ -102,7 +102,7 @@ def get_opal_row(
         data_array = [data[item] for item in opal_headers.values()]
 
     else:
-        data_array = data
+        data_array = data.copy()
         data_index = data_array[0]
 
         del data_array[5:8]
