@@ -1,52 +1,64 @@
 """This module defines the data structures for the Opal model."""
-
 import pandas as pd
+from pydantic import BaseModel, Field
 
 OPAL_START_DATE = "2035-01-22 00:00"
 
-opal_headers = {
-    "Time": "time",
-    "Total Generation": "total_gen",
-    "Total Demand": "total_dem",
-    "Total Offshore Generation": "total_offwind",
-    "Intra-day Market Value": "intra_trade",
-    "Intra-day Market Generation": "intra_gen",
-    "Intra-day Market Demand": "intra_dem",
-    "Intra-day Market Storage": "intra_sto",
-    "Balancing Mechanism Generation": "bm_gen",
-    "Balancing Mechanism Storage": "bm_sto",
-    "Balancing Mechanism Demand": "bm_dem",
-    "Exp. Offshore Wind Generation": "offwind_exp",
-    "Real Offshore Wind Generation": "offwind_real",
-    "Battery Generation": "bat_gen",
-    "Interconnector Power": "inter_gen",
-    "Offshore Wind Generation": "offwind_gen",
-    "Onshore Wind Generation": "onwind_gen",
-    "Other Generation": "other_gen",
-    "Pump Generation": "pump_gen",
-    "PV Generation": "pv_gen",
-    "Nuclear Generation": "nc_gen",
-    "Hydro Generation": "hyd_gen",
-    "Gas Generation": "gas_gen",
-    "Expected Demand": "total_exp",
-    "Real Demand": "total_real",
-    "Balancing Mechanism Value": "bm_cost",
-    "Balancing Mechanism Accepted Power": "bm_accept",
-    "Expected Gridlington Demand": "exp_dem",
-    "Real Gridlington Demand": "real_dem",
-    "Household Activity (Work)": "act_work",
-    "Household Activity (Study)": "act_study",
-    "Household Activity (Home Care)": "act_home",
-    "Household Activity (Personal Care)": "act_pers",
-    "Household Activity (Shopping)": "act_shop",
-    "Household Activity (Leisure)": "act_leis",
-    "Household Activity (Sleep)": "act_sleep",
-    "Expected EV Charging Power": "exp_ev",
-    "Real EV Charging Power": "real_ev",
-    "EV Status (Charging)": "ev_charge",
-    "EV Status (Travelling)": "ev_travel",
-    "EV Status (Idle)": "ev_idle",
-}
+
+class Opal(BaseModel):
+    """Define required key values for Demand Side Response data."""
+
+    frame: int
+    time: float = Field(alias="Time")
+    total_gen: float = Field(alias="Total Generation")
+    total_dem: float = Field(alias="Total Demand")
+    total_offwind: float = Field(alias="Total Offshore Generation")
+    intra_trade: float = Field(alias="Intra-day Market Value")
+    intra_gen: float = Field(alias="Intra-day Market Generation")
+    intra_dem: float = Field(alias="Intra-day Market Demand")
+    intra_sto: float = Field(alias="Intra-day Market Storage")
+    bm_gen: float = Field(alias="Balancing Mechanism Generation")
+    bm_sto: float = Field(alias="Balancing Mechanism Storage")
+    bm_dem: float = Field(alias="Balancing Mechanism Demand")
+    offwind_exp: float = Field(alias="Exp. Offshore Wind Generation")
+    offwind_real: float = Field(alias="Real Offshore Wind Generation")
+    bat_gen: float = Field(alias="Battery Generation")
+    inter_gen: float = Field(alias="Interconnector Power")
+    offwind_gen: float = Field(alias="Offshore Wind Generation")
+    onwind_gen: float = Field(alias="Onshore Wind Generation")
+    other_gen: float = Field(alias="Other Generation")
+    pump_gen: float = Field(alias="Pump Generation")
+    pv_gen: float = Field(alias="PV Generation")
+    nc_gen: float = Field(alias="Nuclear Generation")
+    hyd_gen: float = Field(alias="Hydro Generation")
+    gas_gen: float = Field(alias="Gas Generation")
+    total_exp: float = Field(alias="Expected Demand")
+    total_real: float = Field(alias="Real Demand")
+    bm_cost: float = Field(alias="Balancing Mechanism Value")
+    bm_accept: float = Field(alias="Balancing Mechanism Accepted Power")
+    exp_dem: float = Field(alias="Expected Gridlington Demand")
+    real_dem: float = Field(alias="Real Gridlington Demand")
+    act_work: int = Field(alias="Household Activity (Work)")
+    act_study: int = Field(alias="Household Activity (Study)")
+    act_home: int = Field(alias="Household Activity (Home Care)")
+    act_pers: int = Field(alias="Household Activity (Personal Care)")
+    act_shop: int = Field(alias="Household Activity (Shopping)")
+    act_leis: int = Field(alias="Household Activity (Leisure)")
+    act_sleep: int = Field(alias="Household Activity (Sleep)")
+    exp_ev: float = Field(alias="Expected EV Charging Power")
+    real_ev: float = Field(alias="Real EV Charging Power")
+    ev_charge: int = Field(alias="EV Status (Charging)")
+    ev_travel: int = Field(alias="EV Status (Travelling)")
+    ev_idle: int = Field(alias="EV Status (Idle)")
+
+    class Config:
+        """Allow the field variable names to be used in the API call."""
+
+        allow_population_by_field_name = True
+
+
+opal_headers = {field.alias: field.name for field in Opal.__fields__.values()}
+del opal_headers["frame"]
 
 
 @pd.api.extensions.register_dataframe_accessor("opal")
