@@ -75,6 +75,9 @@ def test_get_opal_api(opal_data):
     client.post("/opal", data=post_data)
 
     response = client.get("/opal")
-    get_data = pd.DataFrame.from_dict(response.json())
 
-    assert get_data == dt.opal_df
+    """Converts API response to Dataframe and compares it to global variable."""
+    get_data = pd.DataFrame(**response.json())
+    get_data["Time"] = pd.to_datetime(get_data["Time"], format="ISO8601")
+
+    assert get_data.equals(dt.opal_df)

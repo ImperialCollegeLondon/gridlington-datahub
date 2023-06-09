@@ -102,7 +102,5 @@ def get_opal_data() -> dict[str | Hashable, Any]:  # type: ignore[misc]
     Returns:
         A Dict of the Opal Dataframe in JSON format
     """
-    data = dt.opal_df.to_dict()
-    # can be converted back to DF with pd.DataFrame.from_json(data)
-
+    data = dt.opal_df.to_dict(orient="split")
     return data
