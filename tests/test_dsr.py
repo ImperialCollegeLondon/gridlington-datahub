@@ -13,7 +13,7 @@ client.headers["Content-Type"] = "application/json"
 @pytest.fixture(autouse=True)
 def reset_dsr_data():
     """Pytest Fixture for resetting DSR data global variable."""
-    dt.opal_df = []
+    dt.dsr_data = []
 
 
 def test_post_dsr_api(dsr_data):
