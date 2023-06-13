@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 OPAL_START_DATE = "2035-01-22 00:00"
 
 
-class Opal(BaseModel):
+class OpalModel(BaseModel):
     """Define required key values for Demand Side Response data."""
 
     frame: int
@@ -57,7 +57,7 @@ class Opal(BaseModel):
         allow_population_by_field_name = True
 
 
-opal_headers = {field.alias: field.name for field in Opal.__fields__.values()}
+opal_headers = {field.alias: field.name for field in OpalModel.__fields__.values()}
 del opal_headers["frame"]
 
 
