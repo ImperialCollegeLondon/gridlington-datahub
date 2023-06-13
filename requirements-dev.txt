@@ -5,13 +5,19 @@
 #    pip-compile --extra=dev --output-file=requirements-dev.txt
 #
 anyio==3.6.2
-    # via starlette
+    # via
+    #   httpcore
+    #   starlette
 attrs==23.1.0
     # via pytest-mypy
 black==23.3.0
     # via datahub (pyproject.toml)
 build==0.10.0
     # via pip-tools
+certifi==2023.5.7
+    # via
+    #   httpcore
+    #   httpx
 cfgv==3.3.1
     # via pre-commit
 click==8.1.3
@@ -41,11 +47,19 @@ filelock==3.11.0
     #   pytest-mypy
     #   virtualenv
 h11==0.14.0
-    # via uvicorn
+    # via
+    #   httpcore
+    #   uvicorn
+httpcore==0.17.2
+    # via httpx
+httpx==0.24.1
+    # via datahub (pyproject.toml)
 identify==2.5.22
     # via pre-commit
 idna==3.4
-    # via anyio
+    # via
+    #   anyio
+    #   httpx
 iniconfig==2.0.0
     # via pytest
 mypy==1.2.0
@@ -114,7 +128,10 @@ ruff==0.0.261
 six==1.16.0
     # via python-dateutil
 sniffio==1.3.0
-    # via anyio
+    # via
+    #   anyio
+    #   httpcore
+    #   httpx
 starlette==0.26.1
     # via fastapi
 tomli==2.0.1

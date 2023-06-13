@@ -25,7 +25,8 @@ dev = [
     "pytest-cov",
     "pytest-mypy",
     "pytest-mock",
-    "pandas-stubs"
+    "pandas-stubs",
+    "httpx"
 ]
 
 [tool.setuptools.packages.find]
