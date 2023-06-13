@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 from . import data as dt
+from .dsr import DSRModel, validate_dsr_sizes
 
 app = FastAPI()
 
@@ -107,3 +108,26 @@ def get_opal_data() -> dict[Hashable, Any]:  # type: ignore[misc]
     """
     data = dt.opal_df.to_dict(orient="split")
     return data
+
+
+@app.post("/dsr")
+def update_dsr_data(data: DSRModel) -> dict[str, str]:
+    """POST method function for appending data to the DSR list.
+
+    Args:
+        data: The DSR Data
+
+    Returns:
+        A dictionary with a success message
+
+    Raises:
+        A HTTPException if the data is invalid
+    """
+    data_dict = data.dict(by_alias=True)
+    if alias := validate_dsr_sizes(data_dict):
+        raise HTTPException(
+            status_code=400, detail=f"Invalid size for: {', '.join(alias)}."
+        )
+    dt.dsr_data.append(data_dict)
+
+    return {"message": "Data submitted successfully."}
