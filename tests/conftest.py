@@ -1,8 +1,19 @@
 import random
 
 import pytest
+from fastapi.testclient import TestClient
 
+from datahub.main import app
 from datahub.opal import opal_headers
+
+
+@pytest.fixture
+def client():
+    """Pytest Fixture for FastAPI Test Client."""
+    client = TestClient(app)
+    client.headers["Content-Type"] = "application/json"
+
+    return client
 
 
 @pytest.fixture

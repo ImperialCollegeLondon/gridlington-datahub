@@ -96,11 +96,14 @@ def create_opal_data(data: OpalDictData | OpalArrayData) -> dict[str, str]:
 
 # TODO: Fix return typing annotation
 @app.get("/opal")
-def get_opal_data() -> dict[str | Hashable, Any]:  # type: ignore[misc]
+def get_opal_data() -> dict[Hashable, Any]:  # type: ignore[misc]
     """GET method function for getting Opal Dataframe as JSON.
 
     Returns:
-        A Dict of the Opal Dataframe in JSON format
+        A Dict of the Opal Dataframe in JSON format.
+
+        This can be converted back to a Dataframe using the following:
+        pd.DataFrame(**data)
     """
     data = dt.opal_df.to_dict(orient="split")
     return data
