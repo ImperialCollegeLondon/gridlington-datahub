@@ -6,7 +6,7 @@ OPAL_START_DATE = "2035-01-22 00:00"
 
 
 class OpalModel(BaseModel):
-    """Define required key values for Demand Side Response data."""
+    """Define required key values for Opal data."""
 
     frame: int
     time: float = Field(alias="Time")
