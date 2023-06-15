@@ -56,7 +56,7 @@ def get_opal_data() -> dict[Hashable, Any]:  # type: ignore[misc]
     """GET method function for getting Opal Dataframe as JSON.
 
     Returns:
-        A Dict of the Opal Dataframe in JSON format.
+        A Dict containing the Opal Dataframe in JSON format.
 
         This can be converted back to a Dataframe using the following:
         pd.DataFrame(**data)
@@ -104,7 +104,7 @@ def get_wesim_data() -> dict[Hashable, Any]:  # type: ignore[misc]
     """GET method function for getting WESIM data as JSON.
 
     Returns:
-        A Dict containing the DSR list.
+        A Dict containing the WESIM data in JSON format.
     """
     data = get_wesim()
     return {"data": data}
