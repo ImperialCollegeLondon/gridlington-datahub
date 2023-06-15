@@ -6,55 +6,9 @@ from pydantic import BaseModel
 
 from . import data as dt
 from .dsr import DSRModel, validate_dsr_sizes
+from .opal import OpalModel
 
 app = FastAPI()
-
-
-class OpalDictData(BaseModel):
-    """Class for defining required key values for Opal data as a dict."""
-
-    frame: int
-    time: float
-    total_gen: float
-    total_dem: float
-    total_offwind: float
-    intra_trade: float
-    intra_gen: float
-    intra_dem: float
-    intra_sto: float
-    bm_gen: float
-    bm_sto: float
-    bm_dem: float
-    offwind_exp: float
-    offwind_real: float
-    bat_gen: float
-    inter_gen: float
-    offwind_gen: float
-    onwind_gen: float
-    other_gen: float
-    pump_gen: float
-    pv_gen: float
-    nc_gen: float
-    hyd_gen: float
-    gas_gen: float
-    total_exp: float
-    total_real: float
-    bm_cost: float
-    bm_accept: float
-    exp_dem: float
-    real_dem: float
-    act_work: int
-    act_study: int
-    act_home: int
-    act_pers: int
-    act_shop: int
-    act_leis: int
-    act_sleep: int
-    exp_ev: float
-    real_ev: float
-    ev_charge: int
-    ev_travel: int
-    ev_idle: int
 
 
 class OpalArrayData(BaseModel):
@@ -64,7 +18,7 @@ class OpalArrayData(BaseModel):
 
 
 @app.post("/opal")
-def create_opal_data(data: OpalDictData | OpalArrayData) -> dict[str, str]:
+def create_opal_data(data: OpalModel | OpalArrayData) -> dict[str, str]:
     """POST method function for appending data to Opal Dataframe.
 
     Args:
