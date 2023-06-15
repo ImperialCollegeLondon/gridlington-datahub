@@ -107,4 +107,7 @@ def get_wesim_data() -> dict[Hashable, Any]:  # type: ignore[misc]
         A Dict containing the WESIM data in JSON format.
     """
     data = get_wesim()
+    for value in data.values():
+        value = value.to_dict(orient="split")
+
     return {"data": data}
