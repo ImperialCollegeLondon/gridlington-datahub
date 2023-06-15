@@ -57,7 +57,11 @@ class OpalModel(BaseModel):
         allow_population_by_field_name = True
 
 
-opal_headers = {field.alias: field.name for field in OpalModel.__fields__.values() if field.name != "frame"}
+opal_headers = {
+    field.alias: field.name
+    for field in OpalModel.__fields__.values()
+    if field.name != "frame"
+}
 
 
 @pd.api.extensions.register_dataframe_accessor("opal")
