@@ -62,7 +62,7 @@ def get_opal_data() -> dict[Hashable, Any]:  # type: ignore[misc]
         pd.DataFrame(**data)
     """
     data = dt.opal_df.to_dict(orient="split")
-    return data
+    return {"data": data}
 
 
 @app.post("/dsr")
