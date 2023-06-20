@@ -52,7 +52,9 @@ def create_opal_data(data: OpalModel | OpalArrayData) -> dict[str, str]:
 
 # TODO: Fix return typing annotation
 @app.get("/opal")
-def get_opal_data() -> dict[Hashable, Any]:  # type: ignore[misc]
+def get_opal_data(  # type: ignore[misc]
+    start: int = 0, end: int | None = None
+) -> dict[Hashable, Any]:
     """GET method function for getting Opal Dataframe as JSON.
 
     Returns:
@@ -61,7 +63,15 @@ def get_opal_data() -> dict[Hashable, Any]:  # type: ignore[misc]
         This can be converted back to a Dataframe using the following:
         pd.DataFrame(**data)
     """
-    data = dt.opal_df.to_dict(orient="split")
+    filtered_df = dt.opal_df.loc[dt.opal_df.index >= start]
+
+    if end:
+        filtered_df = filtered_df.loc[filtered_df.index <= end]
+
+    if filtered_df.empty:
+        raise HTTPException(status_code=404, detail="No data found matching criteria.")
+
+    data = filtered_df.to_dict(orient="split")
     return {"data": data}
 
 
