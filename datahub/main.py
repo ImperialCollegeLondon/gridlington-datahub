@@ -99,14 +99,20 @@ def update_dsr_data(data: DSRModel) -> dict[str, str]:
 
 
 @app.get("/dsr")
-def get_dsr_data() -> dict[Hashable, Any]:  # type: ignore[misc]
+def get_dsr_data(  # type: ignore[misc]
+    start: int = 0, end: int | None = None
+) -> dict[Hashable, Any]:
     """GET method function for getting DSR data as JSON.
 
     Returns:
         A Dict containing the DSR list.
     """
-    data = dt.dsr_data
-    return {"data": data}
+    filtered_data = dt.dsr_data[start:]
+
+    if end:
+        filtered_data = filtered_data[: end - start + 1]
+
+    return {"data": filtered_data}
 
 
 @app.get("/wesim")
