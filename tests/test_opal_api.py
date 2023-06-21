@@ -81,3 +81,26 @@ def test_get_opal_api(client, opal_data):
     get_data["Time"] = pd.to_datetime(get_data["Time"], format="ISO8601")
 
     assert get_data.equals(dt.opal_df)
+
+
+def test_opal_api_get_query(client, opal_data):
+    """Tests the query parameters for the Opal GET method."""
+    for x in range(4):
+        exec(f"data_{x + 1} = opal_data.copy()")
+        exec(f"data_{x + 1}['frame'] = {x + 1}")
+        post_data = json.dumps(eval(f"data_{x + 1}"))
+        client.post("/opal", data=post_data)
+
+    response = client.get("/opal?start=2")
+    assert response.json()["data"]["index"] == [2, 3, 4]
+
+    response = client.get("/opal?end=2")
+    assert response.json()["data"]["index"] == [0, 1, 2]
+
+    response = client.get("/opal?start=1&end=3")
+    assert response.json()["data"]["index"] == [1, 2, 3]
+
+    # Checks that error is raised when data isn't found.
+    response = client.get("/opal?start=6")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "No data found matching criteria."}
