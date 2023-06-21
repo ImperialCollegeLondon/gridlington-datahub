@@ -42,3 +42,33 @@ def test_post_dsr_api_invalid(dsr_data):
 
     response = client.post("/dsr", data=json.dumps(dsr_data))
     assert response.status_code == 422
+
+
+def test_get_dsr_api(dsr_data):
+    """Tests DSR data GET method."""
+    data_1 = dsr_data.copy()
+    data_2 = dsr_data.copy()
+    data_2["Name"] = "Foo"
+    client.post("/dsr", data=json.dumps(data_1))
+    client.post("/dsr", data=json.dumps(data_2))
+
+    response = client.get("/dsr")
+    assert response.json()["data"] == dt.dsr_data
+
+
+def test_dsr_api_get_query(dsr_data):
+    """Tests the query parameters for the DSR GET method."""
+    for x in range(4):
+        exec(f"data_{x + 1} = dsr_data.copy()")
+        exec(f"data_{x + 1}['Name'] = 'DSR_{x + 1}'")
+        post_data = json.dumps(eval(f"data_{x + 1}"))
+        client.post("/opal", data=post_data)
+
+    response = client.get("/dsr?start=2")
+    assert response.json()["data"] == dt.dsr_data[2:]
+
+    response = client.get("/dsr?end=2")
+    assert response.json()["data"] == dt.dsr_data[:3]
+
+    response = client.get("/dsr?start=1&end=2")
+    assert response.json()["data"] == dt.dsr_data[1:3]
