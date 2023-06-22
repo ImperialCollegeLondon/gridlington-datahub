@@ -7,7 +7,6 @@ from pydantic import BaseModel
 from . import data as dt
 from .dsr import DSRModel, validate_dsr_sizes
 from .opal import OpalModel
-from .wesim import get_wesim
 
 app = FastAPI()
 
@@ -119,17 +118,3 @@ def get_dsr_data(  # type: ignore[misc]
     filtered_data = dt.dsr_data[start : end + 1 if end else end]
 
     return {"data": filtered_data}
-
-
-@app.get("/wesim")
-def get_wesim_data() -> dict[Hashable, Any]:  # type: ignore[misc]
-    """GET method function for getting WESIM data as JSON.
-
-    Returns:
-        A Dict containing the WESIM data in JSON format.
-    """
-    data = get_wesim()
-    for value in data.values():
-        value = value.to_dict(orient="split")
-
-    return {"data": data}
