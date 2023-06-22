@@ -45,7 +45,7 @@ def test_post_dsr_api_invalid(dsr_data):
     """Tests POSTing DSR data to API."""
     # Checks invalid array lengths raises an error
     dsr_data["Amount"].append(1.0)
-    dsr_data["Cost"].pop()
+    dsr_data["Cost"][0].pop()
 
     response = client.post("/dsr", data=json.dumps(dsr_data))
     assert response.status_code == 400

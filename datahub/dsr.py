@@ -44,12 +44,13 @@ def validate_dsr_arrays(data: dict[str, str | list]) -> list[str]:
         An empty list if there are no issues. A list of the failing fields if there are.
     """
     aliases = []
-    for field in list(DSRModel.__fields__.values()):
-        if field.annotation == list:
-            array = np.array(data[field.alias])
-            if (
-                array.shape != field.field_info.extra["size"]
-                or array.dtype != np.float64
-            ):
-                aliases.append(field.alias)
+    for alias, field in DSRModel.schema()["properties"].items():
+        if field["type"] == "array":
+            try:
+                array = np.array(data[alias])
+            except ValueError:
+                aliases.append(alias)
+                continue
+            if array.shape != field["size"] or array.dtype != np.float64:
+                aliases.append(alias)
     return aliases
