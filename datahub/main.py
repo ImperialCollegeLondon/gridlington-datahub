@@ -57,19 +57,23 @@ def get_opal_data(  # type: ignore[misc]
 ) -> dict[Hashable, Any]:
     """GET method function for getting Opal Dataframe as JSON.
 
+    Args:
+        start: Starting index for exported Dataframe
+
+        end: Last index that will be included in exported Dataframe
+
     Returns:
-        A Dict containing the Opal Dataframe in JSON format.
+        A Dict containing the Opal Dataframe in JSON format
 
         This can be converted back to a Dataframe using the following:
         pd.DataFrame(**data)
     """
-    filtered_df = dt.opal_df.loc[dt.opal_df.index >= start]
+    if isinstance(end, int) and end < start:
+        raise HTTPException(
+            status_code=400, detail="End parameter cannot be less than Start parameter."
+        )
 
-    if end:
-        filtered_df = filtered_df.loc[filtered_df.index <= end]
-
-    if filtered_df.empty:
-        raise HTTPException(status_code=404, detail="No data found matching criteria.")
+    filtered_df = dt.opal_df.loc[start:end]
 
     data = filtered_df.to_dict(orient="split")
     return {"data": data}
