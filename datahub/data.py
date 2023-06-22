@@ -1,6 +1,4 @@
 """This module defines the data structures for each of the models."""
-from typing import Any
-
 from .opal import create_opal_frame
 
 opal_data = [
@@ -51,9 +49,8 @@ opal_data = [
     34,
 ]
 
-
 opal_df = create_opal_frame()
-dsr_data: list[dict[str, Any]] = []  # type: ignore[misc]
+dsr_data: list[dict[str, str | list]] = []  # type: ignore[type-arg]
 
 
 if __name__ == "__main__":

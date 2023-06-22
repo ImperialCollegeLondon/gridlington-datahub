@@ -1,6 +1,4 @@
 """This module defines the data structures for the MEDUSA Demand Simulator model."""
-from typing import Any
-
 import numpy as np
 from pydantic import BaseModel, Field
 
@@ -35,7 +33,7 @@ class DSRModel(BaseModel):
         allow_population_by_field_name = True
 
 
-def validate_dsr_arrays(data: dict[str, Any]) -> list[str]:  # type: ignore[misc]
+def validate_dsr_arrays(data: dict[str, str | list]) -> list[str]:
     """Validate the sizes of the arrays in the DSR data.
 
     Args:
