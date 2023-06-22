@@ -108,13 +108,15 @@ def get_dsr_data(  # type: ignore[misc]
 ) -> dict[Hashable, Any]:
     """GET method function for getting DSR data as JSON.
 
-    Returns:
-        A Dict containing the DSR list.
-    """
-    filtered_data = dt.dsr_data[start:]
+    Args:
+        start: Starting index for exported list
 
-    if end:
-        filtered_data = filtered_data[: end - start + 1]
+        end: Last index that will be included in exported list
+
+    Returns:
+        A Dict containing the DSR list
+    """
+    filtered_data = dt.dsr_data[start : end + 1 if end else end]
 
     return {"data": filtered_data}
 
