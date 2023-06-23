@@ -40,6 +40,10 @@ disallow_untyped_defs = true
 exclude = [".venv/"]
 
 [[tool.mypy.overrides]]
+module = "datahub.dsr"
+disallow_any_generics = false
+
+[[tool.mypy.overrides]]
 module = "tests.*"
 disallow_untyped_defs = false
 
