@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 from . import data as dt
-from .dsr import DSRModel, validate_dsr_sizes
+from .dsr import DSRModel, validate_dsr_arrays
 from .opal import OpalModel
 
 app = FastAPI()
@@ -92,7 +92,7 @@ def update_dsr_data(data: DSRModel) -> dict[str, str]:
         A HTTPException if the data is invalid
     """
     data_dict = data.dict(by_alias=True)
-    if alias := validate_dsr_sizes(data_dict):
+    if alias := validate_dsr_arrays(data_dict):
         raise HTTPException(
             status_code=400, detail=f"Invalid size for: {', '.join(alias)}."
         )

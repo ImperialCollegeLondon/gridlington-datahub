@@ -58,9 +58,9 @@ class OpalModel(BaseModel):
 
 
 opal_headers = {
-    field.alias: field.name
-    for field in OpalModel.__fields__.values()
-    if field.name != "frame"
+    field["title"]: name
+    for name, field in OpalModel.schema(by_alias=False)["properties"].items()
+    if name != "frame"
 }
 
 
