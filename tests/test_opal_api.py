@@ -100,7 +100,15 @@ def test_opal_api_get_query(client, opal_data):
     response = client.get("/opal?start=1&end=3")
     assert response.json()["data"]["index"] == [1, 2, 3]
 
-    # Checks that error is raised when data isn't found.
+    # Checks that empty data is returned when data isn't found.
     response = client.get("/opal?start=6")
-    assert response.status_code == 404
-    assert response.json() == {"detail": "No data found matching criteria."}
+    print(response.json())
+    assert response.status_code == 200
+    assert len(response.json()["data"]["index"]) == 0
+
+    # Checks that an error is raised when parameters are invalid.
+    response = client.get("/opal?start=3&end=1")
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "End parameter cannot be less than Start parameter."
+    }
