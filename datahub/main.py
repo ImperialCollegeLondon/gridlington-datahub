@@ -115,6 +115,11 @@ def get_dsr_data(  # type: ignore[misc]
     Returns:
         A Dict containing the DSR list
     """
+    if isinstance(end, int) and end < start:
+        raise HTTPException(
+            status_code=400, detail="End parameter cannot be less than Start parameter."
+        )
+
     filtered_data = dt.dsr_data[start : end + 1 if end else end]
 
     return {"data": filtered_data}
