@@ -51,17 +51,31 @@ def create_opal_data(data: OpalModel | OpalArrayData) -> dict[str, str]:
 
 # TODO: Fix return typing annotation
 @app.get("/opal")
-def get_opal_data() -> dict[Hashable, Any]:  # type: ignore[misc]
+def get_opal_data(  # type: ignore[misc]
+    start: int = 0, end: int | None = None
+) -> dict[Hashable, Any]:
     """GET method function for getting Opal Dataframe as JSON.
 
+    Args:
+        start: Starting index for exported Dataframe
+
+        end: Last index that will be included in exported Dataframe
+
     Returns:
-        A Dict of the Opal Dataframe in JSON format.
+        A Dict containing the Opal Dataframe in JSON format
 
         This can be converted back to a Dataframe using the following:
         pd.DataFrame(**data)
     """
-    data = dt.opal_df.to_dict(orient="split")
-    return data
+    if isinstance(end, int) and end < start:
+        raise HTTPException(
+            status_code=400, detail="End parameter cannot be less than Start parameter."
+        )
+
+    filtered_df = dt.opal_df.loc[start:end]
+
+    data = filtered_df.to_dict(orient="split")
+    return {"data": data}
 
 
 @app.post("/dsr")
@@ -85,3 +99,27 @@ def update_dsr_data(data: DSRModel) -> dict[str, str]:
     dt.dsr_data.append(data_dict)
 
     return {"message": "Data submitted successfully."}
+
+
+@app.get("/dsr")
+def get_dsr_data(  # type: ignore[misc]
+    start: int = 0, end: int | None = None
+) -> dict[Hashable, Any]:
+    """GET method function for getting DSR data as JSON.
+
+    Args:
+        start: Starting index for exported list
+
+        end: Last index that will be included in exported list
+
+    Returns:
+        A Dict containing the DSR list
+    """
+    if isinstance(end, int) and end < start:
+        raise HTTPException(
+            status_code=400, detail="End parameter cannot be less than Start parameter."
+        )
+
+    filtered_data = dt.dsr_data[start : end + 1 if end else end]
+
+    return {"data": filtered_data}

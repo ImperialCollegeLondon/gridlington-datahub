@@ -57,3 +57,20 @@ def test_post_dsr_api_invalid(dsr_data):
     response = client.post("/dsr", data=json.dumps(dsr_data))
     assert response.status_code == 422
     assert response.json()["detail"][0]["msg"] == "field required"
+
+
+def test_get_dsr_api():
+    """Tests DSR data GET method."""
+    dt.dsr_data = [0, 1, 2, 3, 4, 5]
+
+    response = client.get("/dsr")
+    assert response.json()["data"] == dt.dsr_data
+
+    response = client.get("/dsr?start=2")
+    assert response.json()["data"] == dt.dsr_data[2:]
+
+    response = client.get("/dsr?end=2")
+    assert response.json()["data"] == dt.dsr_data[:3]
+
+    response = client.get("/dsr?start=1&end=2")
+    assert response.json()["data"] == dt.dsr_data[1:3]
