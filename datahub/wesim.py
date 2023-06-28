@@ -14,29 +14,48 @@ INTERCONNECTORS_KEY = {"SCO-IE", "NEW-NOR", "NEW-IE", "SEW-CE"}
 WESIM_DATA_FILE = "../1_Wesim_GB_hourly_data.xlsx"  # TODO: move to config
 
 
-def read_wesim() -> dict[int | str, pd.DataFrame]:
+def read_wesim(wesim_data_file: str) -> dict[int | str, pd.DataFrame]:
     """Read the WESIM data from the excel file.
 
     Returns:
         pd.DataFrame: A Dictionary of DataFrames for each sheet in the file
     """
-    excel = pd.read_excel(
-        WESIM_DATA_FILE,
-        sheet_name=None,
-        header=[3, 4],
-        index_col=1,
-    )
-
-    # Remove Sheet1 (it is just the totals from all the other sheets)
-    excel.pop("Sheet1", None)
+    with pd.ExcelFile(wesim_data_file) as xlsx:
+        # Read first 4 Sheets
+        excel = pd.read_excel(
+            xlsx,
+            sheet_name=xlsx.sheet_names[:4],
+            header=[3, 4],
+            index_col=1,
+        )
+        # Read Interconnectors sheet
+        interconnectors = pd.read_excel(
+            xlsx,
+            sheet_name=xlsx.sheet_names[4],
+            header=4,
+            index_col=0,
+            usecols="B:G",
+        )
+        interconnectors.columns = pd.MultiIndex.from_product(
+            [["Interconnector"], interconnectors.columns]
+        )
+        excel[xlsx.sheet_names[4]] = interconnectors
+        # Read Interconnector capacity from Interconnectors sheet
+        excel["Interconnector Capacity"] = pd.read_excel(
+            xlsx,
+            sheet_name=xlsx.sheet_names[4],
+            header=3,
+            usecols="J:K",
+            nrows=4,
+        )
 
     return excel
 
 
 def structure_wesim(df: pd.DataFrame) -> pd.DataFrame:
-    """Structures the WESIM data.
+    """Structures the Regions and Interconnectors WESIM data.
 
-    The final DataFrame will have columns: Hour, Region Code, and some other data
+    The final DataFrame will have columns: Hour, Code, and some usage data.
 
     Args:
         df: The unstructured wesim data
@@ -62,9 +81,9 @@ def structure_wesim(df: pd.DataFrame) -> pd.DataFrame:
     # Change from multi-level columns headings to vertically-stacked columns
     stacked = df.stack()
 
-    # Move the Hour and Region Code data from a multi-index to individual columns
+    # Move the Hour and Code data from a multi-index to individual columns
     if isinstance(stacked, pd.DataFrame):
-        df = stacked.reset_index(names=["Hour", "Region Code"])
+        df = stacked.reset_index(names=["Hour", "Code"])
         df.columns.name = None
     else:
         raise ValueError("Could not process input WESIM data")
@@ -74,8 +93,6 @@ def structure_wesim(df: pd.DataFrame) -> pd.DataFrame:
 
 def structure_capacity(df: pd.DataFrame) -> pd.DataFrame:
     """Structures the Capacity dataframe.
-
-    TODO: This needs to be tidied.
 
     Args:
         df: The DF as read from the excel file
@@ -89,54 +106,26 @@ def structure_capacity(df: pd.DataFrame) -> pd.DataFrame:
     df = df[[col for col in df.columns if col[0] == "Region"]]
     df = df.transpose()
     df.index = df.index.droplevel(0)
-    df.index.name = "Region Code"
+    df.index.name = "Code"
 
     # Return with the a Region columns matching the regions keys
-    return df.reset_index().replace({"Region Code": REGIONS_KEY})
-
-
-def structure_interconnectors(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Structures the Interconnectors and Interconnector capacities dataframes.
-
-    TODO: This needs to be tidied.
-
-    Args:
-        df: The DF as read from the excel file
-
-    Returns:
-        Two structured Dataframes
-    """
-    df = df.dropna(axis="columns", how="all")
-
-    # Separate out interconnector flow data from the capacity data
-    interconnectors = structure_wesim(df[df.columns[:5]])
-    interconnector_capacity = df[["Code", "Capacity (MW)"]].dropna().T.reset_index().T
-
-    # Name the columns corerctly and select the correct rows
-    interconnector_capacity = interconnector_capacity.rename(
-        columns=dict(zip(interconnector_capacity.columns, ["Region Code", "Capacity"]))
-    )
-    interconnector_capacity = interconnector_capacity.iloc[1:].reset_index(drop=True)
-
-    return interconnectors, interconnector_capacity
+    return df.reset_index().replace({"Code": REGIONS_KEY})
 
 
 def get_wesim() -> dict[str, pd.DataFrame]:
-    """Gets the WESIM data from disk.
+    """Gets the WESIM data from disk and puts it into pandas dataframes.
 
     Returns:
         The WESIM data
     """
-    excel = read_wesim()
+    excel = read_wesim(WESIM_DATA_FILE)
 
     capacity = structure_capacity(excel.pop("Capacity"))
-
-    interconnectors, interconnector_capacity = structure_interconnectors(
-        excel.pop("Interconnector flows")
-    )
+    interconnectors = structure_wesim(excel.pop("Interconnector flows"))
+    interconnector_capacity = excel.pop("Interconnector Capacity")
 
     # Combine the regions data from separate sheets into one DF
-    regions = pd.DataFrame(columns=["Hour", "Region Code"])
+    regions = pd.DataFrame(columns=["Hour", "Code"])
     for df in excel.values():
         regions = regions.merge(structure_wesim(df), how="outer")
 
