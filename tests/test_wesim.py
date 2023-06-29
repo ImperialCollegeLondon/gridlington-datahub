@@ -1,6 +1,8 @@
 import pandas as pd
 import pytest
 
+from datahub import data as dt
+
 
 @pytest.fixture
 def wesim_input_data():
@@ -82,3 +84,21 @@ def test_get_wesim(mocker, wesim_input_data):
     assert wesim["Regions"].shape == (30, 10)
     assert wesim["Interconnector Capacity"].shape == (4, 2)
     assert wesim["Interconnectors"].shape == (25, 3)
+
+
+def test_get_wesim_api(client, mocker, wesim_input_data):
+    """Test get_wesim returns a dictionary with appropriate DataFrames."""
+    with mocker.patch("datahub.wesim.read_wesim", return_value=wesim_input_data):
+        response = client.get("/wesim")
+
+    get_data = pd.DataFrame(**response.json()["data"]["Capacity"])
+    assert get_data.equals(dt.wesim_data["Capacity"])
+
+    get_data = pd.DataFrame(**response.json()["data"]["Regions"])
+    assert get_data.equals(dt.wesim_data["Regions"])
+
+    get_data = pd.DataFrame(**response.json()["data"]["Interconnector Capacity"])
+    assert get_data.equals(dt.wesim_data["Interconnector Capacity"])
+
+    get_data = pd.DataFrame(**response.json()["data"]["Interconnectors"])
+    assert get_data.equals(dt.wesim_data["Interconnectors"])
