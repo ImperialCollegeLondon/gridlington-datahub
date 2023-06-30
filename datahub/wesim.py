@@ -1,5 +1,5 @@
 """This module defines the data structures for the WESIM model."""
-from typing import Hashable
+from typing import Any
 
 import pandas as pd
 
@@ -113,7 +113,7 @@ def structure_capacity(df: pd.DataFrame) -> pd.DataFrame:
     return df.reset_index().replace({"Code": REGIONS_KEY})
 
 
-def get_wesim() -> dict[str, dict[Hashable, str | float]]:
+def get_wesim() -> dict[str, Any]:  # type: ignore[misc]
     """Gets the WESIM data from disk and puts it into pandas dataframes.
 
     Returns:
