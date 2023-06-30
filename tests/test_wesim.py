@@ -80,10 +80,10 @@ def test_get_wesim(mocker, wesim_input_data):
     with mocker.patch("datahub.wesim.read_wesim", return_value=wesim_input_data):
         wesim = get_wesim()
 
-    assert wesim["Capacity"].shape == (6, 12)
-    assert wesim["Regions"].shape == (30, 10)
-    assert wesim["Interconnector Capacity"].shape == (4, 2)
-    assert wesim["Interconnectors"].shape == (25, 3)
+    assert pd.DataFrame(**wesim["Capacity"]).shape == (6, 12)
+    assert pd.DataFrame(**wesim["Regions"]).shape == (30, 10)
+    assert pd.DataFrame(**wesim["Interconnector Capacity"]).shape == (4, 2)
+    assert pd.DataFrame(**wesim["Interconnectors"]).shape == (25, 3)
 
 
 def test_get_wesim_api(client, mocker, wesim_input_data):
@@ -91,14 +91,4 @@ def test_get_wesim_api(client, mocker, wesim_input_data):
     with mocker.patch("datahub.wesim.read_wesim", return_value=wesim_input_data):
         response = client.get("/wesim")
 
-    get_data = pd.DataFrame(**response.json()["data"]["Capacity"])
-    assert get_data.equals(dt.wesim_data["Capacity"])
-
-    get_data = pd.DataFrame(**response.json()["data"]["Regions"])
-    assert get_data.equals(dt.wesim_data["Regions"])
-
-    get_data = pd.DataFrame(**response.json()["data"]["Interconnector Capacity"])
-    assert get_data.equals(dt.wesim_data["Interconnector Capacity"])
-
-    get_data = pd.DataFrame(**response.json()["data"]["Interconnectors"])
-    assert get_data.equals(dt.wesim_data["Interconnectors"])
+    assert response.json()["data"] == dt.wesim_data

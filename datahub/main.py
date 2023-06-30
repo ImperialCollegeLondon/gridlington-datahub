@@ -133,15 +133,14 @@ def get_wesim_data() -> dict[Hashable, Any]:  # type: ignore[misc]
     Returns:
         A Dict containing the Wesim Dataframes
     """
-    dt.wesim_data = get_wesim()
+    if dt.wesim_data == {}:
+        dt.wesim_data = get_wesim()
 
     data = {
-        "Capacity": dt.wesim_data["Capacity"].to_dict(orient="split"),
-        "Regions": dt.wesim_data["Regions"].to_dict(orient="split"),
-        "Interconnector Capacity": dt.wesim_data["Interconnector Capacity"].to_dict(
-            orient="split"
-        ),
-        "Interconnectors": dt.wesim_data["Interconnectors"].to_dict(orient="split"),
+        "Capacity": dt.wesim_data["Capacity"],
+        "Regions": dt.wesim_data["Regions"],
+        "Interconnector Capacity": dt.wesim_data["Interconnector Capacity"],
+        "Interconnectors": dt.wesim_data["Interconnectors"],
     }
 
     return {"data": data}
