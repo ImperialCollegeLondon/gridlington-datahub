@@ -136,11 +136,4 @@ def get_wesim_data() -> dict[Hashable, Any]:  # type: ignore[misc]
     if dt.wesim_data == {}:
         dt.wesim_data = get_wesim()
 
-    data = {
-        "Capacity": dt.wesim_data["Capacity"],
-        "Regions": dt.wesim_data["Regions"],
-        "Interconnector Capacity": dt.wesim_data["Interconnector Capacity"],
-        "Interconnectors": dt.wesim_data["Interconnectors"],
-    }
-
-    return {"data": data}
+    return {"data": dt.wesim_data}
