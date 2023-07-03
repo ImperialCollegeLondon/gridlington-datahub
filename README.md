@@ -1,5 +1,17 @@
 # gridlington-datahub
 
+## Running the Server
+
+A Dockerfile and docker-compose is provided to be able to run the server. This should be as simple as:
+
+```bash
+docker compose up
+```
+
+And the server will be available at `localhost:8000`
+
+API docs can be seen at `localhost:8000/docs`
+
 ## Development
 
 ### Installation
