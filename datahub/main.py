@@ -1,15 +1,25 @@
 """Script for running Datahub API."""
+import logging
+import logging.config
 from typing import Any, Hashable
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+
+from datahub.core.log_config import logging_dict_config
 
 from . import data as dt
 from .dsr import DSRModel, validate_dsr_arrays
 from .opal import OpalModel
 from .wesim import get_wesim
 
+logging.config.dictConfig(logging_dict_config)
+
 app = FastAPI()
+
+log = logging.getLogger("api_logger")
+log.debug("Logging is configured.")
+log.info("Datahub API is running...")
 
 
 class OpalArrayData(BaseModel):
@@ -28,24 +38,41 @@ def create_opal_data(data: OpalModel | OpalArrayData) -> dict[str, str]:
     Returns:
         A Dict of the Opal data that has just been added to the Dataframe
     """
+    log.info("Recieved Opal data.")
+
     raw_data = data.dict()
 
     if isinstance(data, OpalArrayData):
+        log.info("Array format detected.")
         append_input = raw_data["array"]
     else:
+        log.info("Dict format detected.")
         append_input = raw_data
 
-    # TODO: Change print statements to more formal logging
-    print(dt.opal_df)
+    log.info(
+        """Original Opal DataFrame:
+
+        %s
+        """,
+        dt.opal_df,
+    )
 
     if isinstance(append_input, list) and not len(append_input) == 45:
+        log.error("Array has invalid length. Expecting 45 items.")
         raise HTTPException(
             status_code=400, detail="Array has invalid length. Expecting 45 items."
         )
 
+    log.info("Appending new data...")
     dt.opal_df.opal.append(append_input)
 
-    print(dt.opal_df)
+    log.info(
+        """Updated Opal DataFrame:
+        
+        %s
+        """,
+        dt.opal_df,
+    )
 
     return {"message": "Data submitted successfully."}
 
