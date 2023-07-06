@@ -1,8 +1,11 @@
 version: '3'
 services:
-  web:
+  app:
     build: .
+    environment:
+      - WESIM_DATA_FILE=/data/wesim_data.xlsx
     ports:
-      - 127.0.0.1:8000:80
+      - 127.0.0.1:80:80
     volumes:
-      - ./datahub:/code/app
+      - ./datahub:/src/app
+      - ../1_Wesim_GB_hourly_data.xlsx:/data/wesim_data.xlsx
