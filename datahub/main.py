@@ -40,16 +40,14 @@ def create_opal_data(data: OpalModel | OpalArrayData) -> dict[str, str]:
         log.info("Dict format detected.")
         append_input = raw_data
 
-    log.debug(f"Original Opal DataFrame:\n\n{dt.opal_df}")
-
     if isinstance(append_input, list) and not len(append_input) == 45:
         message = "Array has invalid length. Expecting 45 items."
         log.error(message)
         raise HTTPException(status_code=400, detail=message)
 
     log.info("Appending new data...")
+    log.debug(f"Original Opal DataFrame:\n\n{dt.opal_df}")
     dt.opal_df.opal.append(append_input)
-
     log.debug(f"Updated Opal DataFrame:\n\n{dt.opal_df}")
 
     return {"message": "Data submitted successfully."}
@@ -73,12 +71,17 @@ def get_opal_data(  # type: ignore[misc]
         This can be converted back to a Dataframe using the following:
         pd.DataFrame(**data)
     """
+    log.info("Sending Opal data...")
+    log.debug(f"Query parameters:\n\nstart={start}\nend={end}\n")
     if isinstance(end, int) and end < start:
-        raise HTTPException(
-            status_code=400, detail="End parameter cannot be less than Start parameter."
-        )
+        message = "End parameter cannot be less than Start parameter."
+        log.error(message)
+        raise HTTPException(status_code=400, detail=message)
 
+    log.info("Filtering data...")
+    log.debug(f"Current Opal DataFrame:\n\n{dt.opal_df}")
     filtered_df = dt.opal_df.loc[start:end]
+    log.debug(f"Filtered Opal DataFrame:\n\n{dt.opal_df}")
 
     data = filtered_df.to_dict(orient="split")
     return {"data": data}
@@ -97,12 +100,17 @@ def update_dsr_data(data: DSRModel) -> dict[str, str]:
     Raises:
         A HTTPException if the data is invalid
     """
+    log.info("Recieved Opal data.")
     data_dict = data.dict(by_alias=True)
     if alias := validate_dsr_arrays(data_dict):
-        raise HTTPException(
-            status_code=400, detail=f"Invalid size for: {', '.join(alias)}."
-        )
+        message = f"Invalid size for: {', '.join(alias)}."
+        log.error(message)
+        raise HTTPException(status_code=400, detail=message)
+
+    log.info("Appending new data...")
+    log.debug(f"Current DSR data length: {len(dt.dsr_data)}")
     dt.dsr_data.append(data_dict)
+    log.debug(f"Updated DSR data length: {len(dt.dsr_data)}")
 
     return {"message": "Data submitted successfully."}
 
@@ -121,12 +129,17 @@ def get_dsr_data(  # type: ignore[misc]
     Returns:
         A Dict containing the DSR list
     """
+    log.info("Sending DSR data...")
+    log.debug(f"Query parameters:\n\nstart={start}\nend={end}\n")
     if isinstance(end, int) and end < start:
-        raise HTTPException(
-            status_code=400, detail="End parameter cannot be less than Start parameter."
-        )
+        message = "End parameter cannot be less than Start parameter."
+        log.error(message)
+        raise HTTPException(status_code=400, detail=message)
 
+    log.info("Filtering data...")
+    log.debug(f"Current DSR data length:\n\n{len(dt.dsr_data)}")
     filtered_data = dt.dsr_data[start : end + 1 if end else end]
+    log.debug(f"Filtered DSR data length:\n\n{len(dt.dsr_data)}")
 
     return {"data": filtered_data}
 
@@ -138,7 +151,9 @@ def get_wesim_data() -> dict[Hashable, Any]:  # type: ignore[misc]
     Returns:
         A Dict containing the Wesim Dataframes
     """
+    log.info("Sending Wesim data...")
     if dt.wesim_data == {}:
+        log.debug("Wesim data empty! Creating Wesim data...")
         dt.wesim_data = get_wesim()
 
     return {"data": dt.wesim_data}
