@@ -23,6 +23,7 @@ API docs can be seen at `localhost:8000/docs`
 5. Run tests: `pytest`. This will create a coverage report inside `htmlcov/`.
 
 ### Dependencies
+
 Dependencies are managed using the [`pip-tools`] tool chain. Unpinned dependencies are specified in `pyproject.toml`. Pinned versions are then produced with: `pip-compile`.
 
 To add/remove packages edit `pyproject.toml` and run the above command. To upgrade all existing dependencies run: `pip-compile --upgrade`.
