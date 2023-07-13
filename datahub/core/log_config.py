@@ -17,12 +17,18 @@ logging_dict_config = {
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stderr",
             "level": LOG_LEVEL,
-        }
+        },
+        "file": {
+            "level": LOG_LEVEL,
+            "class": "logging.FileHandler",
+            "filename": "./log/logging_file.log",
+            "formatter": "basic",
+        },
     },
     "loggers": {
         "api_logger": {
-            "handlers": ["console"],
+            "handlers": ["console", "file"],
             "level": LOG_LEVEL,
-        }
+        },
     },
 }
