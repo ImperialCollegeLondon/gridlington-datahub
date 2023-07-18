@@ -1,7 +1,8 @@
 """Script for running Datahub API."""
 from typing import Any, Hashable
 
-from fastapi import FastAPI, HTTPException
+import h5py
+from fastapi import FastAPI, HTTPException, UploadFile
 from pydantic import BaseModel
 
 from . import data as dt
@@ -85,6 +86,33 @@ def get_opal_data(  # type: ignore[misc]
 
     data = filtered_df.to_dict(orient="split")
     return {"data": data}
+
+
+@app.post("/upload-dsr-file")
+def upload_dsr(file: UploadFile) -> dict[str, str | None]:
+    """POST method for appending data to the DSR list.
+
+    This takes a HDF5 file as input.
+
+    \f
+
+    Args:
+        file (UploadFile): A HDF5 file with the DSR data.
+
+    Raises:
+        HTTPException: If the data is invalid
+
+    Returns:
+        dict[str, str]: dictionary with the filename
+    """  # noqa: D301
+    with h5py.File(file.file, "r") as h5file:
+        data = {key: value[...] for key, value in h5file.items()}
+    if alias := validate_dsr_arrays(data):
+        raise HTTPException(
+            status_code=400, detail=f"Invalid size for: {', '.join(alias)}."
+        )
+    dt.dsr_data.append(data)
+    return {"filename": file.filename}
 
 
 @app.post("/dsr")
