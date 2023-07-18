@@ -1,4 +1,5 @@
 """This module defines the data structures for the WESIM model."""
+import os
 from typing import Any, Hashable
 
 import pandas as pd
@@ -12,7 +13,7 @@ REGIONS_KEY = {
 }
 
 INTERCONNECTORS_KEY = {"SCO-IE", "NEW-NOR", "NEW-IE", "SEW-CE"}
-WESIM_DATA_FILE = "../1_Wesim_GB_hourly_data.xlsx"  # TODO: move to config
+WESIM_DATA_FILE = os.environ.get("WESIM_DATA_FILE", "../1_Wesim_GB_hourly_data.xlsx")
 
 
 def read_wesim(wesim_data_file: str) -> dict[int | str, pd.DataFrame]:
