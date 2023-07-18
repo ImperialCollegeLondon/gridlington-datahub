@@ -116,6 +116,8 @@ pytest-mypy==0.10.3
     # via datahub (pyproject.toml)
 python-dateutil==2.8.2
     # via pandas
+python-multipart==0.0.6
+    # via datahub (pyproject.toml)
 pytz==2023.3
     # via pandas
 pyxlsb==1.0.10
