@@ -34,7 +34,7 @@ class DSRModel(BaseModel):
         allow_population_by_field_name = True
 
 
-def validate_dsr_arrays(data: dict[str, str | NDArray]) -> list[str]:
+def validate_dsr_arrays(data: dict[str, NDArray]) -> list[str]:
     """Validate the shapes of the arrays in the DSR data.
 
     Args:
@@ -47,13 +47,13 @@ def validate_dsr_arrays(data: dict[str, str | NDArray]) -> list[str]:
     aliases = []
     for alias, field in DSRModel.schema()["properties"].items():
         try:
-            element = data[alias]
+            array = data[alias]
         except ValueError:
             aliases.append(alias)
             continue
-        if isinstance(element, np.ndarray):
-            if element.shape != field["shape"] or not np.issubdtype(
-                element.dtype, np.number
+        if field["type"] == "array":
+            if array.shape != field["shape"] or not np.issubdtype(
+                array.dtype, np.number
             ):
                 aliases.append(alias)
     return aliases
