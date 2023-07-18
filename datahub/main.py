@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from . import data as dt
 from . import log
-from .dsr import DSRModel, validate_dsr_arrays
+from .dsr import validate_dsr_arrays
 from .opal import OpalModel
 from .wesim import get_wesim
 
@@ -88,7 +88,7 @@ def get_opal_data(  # type: ignore[misc]
     return {"data": data}
 
 
-@app.post("/upload-dsr-file")
+@app.post("/dsr")
 def upload_dsr(file: UploadFile) -> dict[str, str | None]:
     """POST method for appending data to the DSR list.
 
@@ -105,42 +105,19 @@ def upload_dsr(file: UploadFile) -> dict[str, str | None]:
     Returns:
         dict[str, str]: dictionary with the filename
     """  # noqa: D301
+    log.info("Recieved Opal data.")
     with h5py.File(file.file, "r") as h5file:
         data = {key: value[...] for key, value in h5file.items()}
     if alias := validate_dsr_arrays(data):
         raise HTTPException(
             status_code=400, detail=f"Invalid size for: {', '.join(alias)}."
         )
-    dt.dsr_data.append(data)
-    return {"filename": file.filename}
-
-
-@app.post("/dsr")
-def update_dsr_data(data: DSRModel) -> dict[str, str]:
-    """POST method function for appending data to the DSR list.
-
-    Args:
-        data: The DSR Data
-
-    Returns:
-        A dictionary with a success message
-
-    Raises:
-        A HTTPException if the data is invalid
-    """
-    log.info("Recieved Opal data.")
-    data_dict = data.dict(by_alias=True)
-    if alias := validate_dsr_arrays(data_dict):
-        message = f"Invalid size for: {', '.join(alias)}."
-        log.error(message)
-        raise HTTPException(status_code=400, detail=message)
-
     log.info("Appending new data...")
     log.debug(f"Current DSR data length: {len(dt.dsr_data)}")
-    dt.dsr_data.append(data_dict)
+    dt.dsr_data.append(data)
     log.debug(f"Updated DSR data length: {len(dt.dsr_data)}")
 
-    return {"message": "Data submitted successfully."}
+    return {"filename": file.filename}
 
 
 @app.get("/dsr")
