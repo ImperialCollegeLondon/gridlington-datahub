@@ -15,16 +15,28 @@ def reset_dsr_data():
     dt.dsr_data = []
 
 
-def test_validate_dsr_arrays(dsr_data):
+def test_validate_dsr_data(dsr_data):
     """Tests the validate_dsr_arrays function."""
-    from datahub.dsr import validate_dsr_arrays
+    from fastapi import HTTPException
 
-    assert validate_dsr_arrays(dsr_data) == []
+    from datahub.dsr import validate_dsr_data
 
+    # Confirm no errors are raised
+    validate_dsr_data(dsr_data)
+
+    # Check invalid array lengths raises an error
     dsr_data["Amount"] = np.append(dsr_data["Amount"], 1.0)
-    dsr_data["Cost"] = np.delete(dsr_data["Cost"], 1)
+    dsr_data["Cost"] = dsr_data["Cost"][1:]
 
-    assert validate_dsr_arrays(dsr_data) == ["Amount", "Cost"]
+    with pytest.raises(HTTPException) as err:
+        validate_dsr_data(dsr_data)
+    assert err.value.detail == "Invalid size for: Amount, Cost."
+
+    dsr_data.pop("Amount")
+
+    with pytest.raises(HTTPException) as err:
+        validate_dsr_data(dsr_data)
+    assert err.value.detail == "Missing required fields: Amount."
 
 
 def test_post_dsr_api(dsr_data_path):
@@ -40,9 +52,9 @@ def test_post_dsr_api(dsr_data_path):
 
 
 def test_post_dsr_api_invalid(dsr_data_path):
-    """Tests POSTing DSR data to API."""
+    """Tests POSTing invalid DSR data to API."""
+    # Check invalid array lengths raises an error
     with h5py.File(dsr_data_path, "r+") as dsr_data:
-        # Checks invalid array lengths raises an error
         amount = dsr_data.pop("Amount")[...]
         dsr_data["Amount"] = np.append(amount, 1.0)
         cost = dsr_data.pop("Cost")[...]
@@ -50,17 +62,20 @@ def test_post_dsr_api_invalid(dsr_data_path):
 
     with open(dsr_data_path, "rb") as dsr_data:
         response = client.post("/dsr", files={"file": dsr_data})
-        assert response.status_code == 400
-        assert response.json() == {"detail": "Invalid size for: Amount, Cost."}
+        assert response.status_code == 422
+        assert response.json()["detail"] == "Invalid size for: Amount, Cost."
 
+    # Check missing fields raises an error
     with h5py.File(dsr_data_path, "r+") as dsr_data:
-        # Checks missing fields raises an error
         dsr_data.pop("Amount")
 
     with open(dsr_data_path, "rb") as dsr_data:
         response = client.post("/dsr", files={"file": dsr_data})
         assert response.status_code == 422
-        assert response.json()["detail"][0]["msg"] == "field required"
+        assert response.json()["detail"] == "Missing required fields: Amount."
+
+    # Checks that the DSR global variable has not been updated
+    assert len(dt.dsr_data) == 0
 
 
 def test_get_dsr_api():

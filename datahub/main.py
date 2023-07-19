@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from . import data as dt
 from . import log
-from .dsr import validate_dsr_arrays
+from .dsr import validate_dsr_data
 from .opal import OpalModel
 from .wesim import get_wesim
 
@@ -92,7 +92,8 @@ def get_opal_data(  # type: ignore[misc]
 def upload_dsr(file: UploadFile) -> dict[str, str | None]:
     """POST method for appending data to the DSR list.
 
-    This takes a HDF5 file as input.
+    This takes a HDF5 file as input. Data specification can be found at
+    https://github.com/ImperialCollegeLondon/gridlington-datahub/wiki/Agent-model-data#output
 
     \f
 
@@ -108,10 +109,9 @@ def upload_dsr(file: UploadFile) -> dict[str, str | None]:
     log.info("Recieved Opal data.")
     with h5py.File(file.file, "r") as h5file:
         data = {key: value[...] for key, value in h5file.items()}
-    if alias := validate_dsr_arrays(data):
-        raise HTTPException(
-            status_code=400, detail=f"Invalid size for: {', '.join(alias)}."
-        )
+
+    validate_dsr_data(data)
+
     log.info("Appending new data...")
     log.debug(f"Current DSR data length: {len(dt.dsr_data)}")
     dt.dsr_data.append(data)

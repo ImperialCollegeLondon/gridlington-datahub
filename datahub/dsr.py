@@ -1,5 +1,6 @@
 """This module defines the data structures for the MEDUSA Demand Simulator model."""
 import numpy as np
+from fastapi import HTTPException
 from numpy.typing import NDArray
 from pydantic import BaseModel, Field
 
@@ -34,26 +35,40 @@ class DSRModel(BaseModel):
         allow_population_by_field_name = True
 
 
-def validate_dsr_arrays(data: dict[str, NDArray]) -> list[str]:
+def validate_dsr_data(data: dict[str, NDArray]) -> None:
     """Validate the shapes of the arrays in the DSR data.
 
     Args:
         data: The dictionary representation of the DSR Data. The keys are field aliases.
             It is generated with the data.dict(by_alias=True) where data is a DSRModel.
 
-    Returns:
-        An empty list if there are no issues. A list of the failing fields if there are.
+    Raises:
+        A HTTPException is there are mising failing fields if there are.
     """
+    missing_fields = [
+        field for field in DSRModel.schema()["required"] if field not in data.keys()
+    ]
+    if missing_fields:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Missing required fields: {', '.join(missing_fields)}.",
+        )
+
     aliases = []
     for alias, field in DSRModel.schema()["properties"].items():
         try:
             array = data[alias]
-        except ValueError:
-            aliases.append(alias)
+        except KeyError:
+            if field:
+                aliases.append(alias)
             continue
         if field["type"] == "array":
             if array.shape != field["shape"] or not np.issubdtype(
                 array.dtype, np.number
             ):
                 aliases.append(alias)
-    return aliases
+    if aliases:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid size for: {', '.join(aliases)}.",
+        )
