@@ -63,7 +63,6 @@ def get_opal_data(  # type: ignore[misc]
 
     Args:
         start: Starting index for exported Dataframe
-
         end: Last index that will be included in exported Dataframe
 
     Returns:
@@ -92,8 +91,33 @@ def get_opal_data(  # type: ignore[misc]
 def upload_dsr(file: UploadFile) -> dict[str, str | None]:
     """POST method for appending data to the DSR list.
 
-    This takes a HDF5 file as input. Data specification can be found at
-    https://github.com/ImperialCollegeLondon/gridlington-datahub/wiki/Agent-model-data#output
+    This takes a HDF5 file as input. This file has a flat structure, with each dataset
+    available at the top level.
+
+    The required fields (datasets) are:
+    - Amount (13 x 1)
+    - Cost (1440 x 13)
+    - kWh Cost (2 x 1)
+    - Activities (1440 x 7)
+    - Activities Outside Home (1440 x 7)
+    - Activity Types (7 x 1)
+    - EV DT (1440 x 2)
+    - EV State (1440 x 4329)
+    - Baseline EV (1440 x 1)
+    - Baseline Non-EV (1440 x 1)
+    - Actual EV (1440 x 1)
+    - Actual Non-EV (1440 x 1)
+
+    The optional fields are:
+    - EV ID Matrix (1440 x 4329)
+    - EV Locations (1440 x 4329)
+    - EV Battery (1440 x 4329)
+    - EV Mask (1440 x 4329)
+    - Name (str)
+    - Warn (str)
+
+    Further details for the DSR data specification can be found in
+    [the GitHub wiki.](https://github.com/ImperialCollegeLondon/gridlington-datahub/wiki/Agent-model-data#output)
 
     \f
 
@@ -128,7 +152,6 @@ def get_dsr_data(  # type: ignore[misc]
 
     Args:
         start: Starting index for exported list
-
         end: Last index that will be included in exported list
 
     Returns:
