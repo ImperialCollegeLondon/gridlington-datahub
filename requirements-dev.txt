@@ -47,6 +47,8 @@ h11==0.14.0
     # via
     #   httpcore
     #   uvicorn
+h5py==3.9.0
+    # via datahub (pyproject.toml)
 httpcore==0.17.2
     # via httpx
 httpx==0.24.1
@@ -71,6 +73,7 @@ nodeenv==1.8.0
     # via pre-commit
 numpy==1.25.0
     # via
+    #   h5py
     #   pandas
     #   pandas-stubs
 odfpy==1.4.1
