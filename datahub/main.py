@@ -1,7 +1,7 @@
 """Script for running Datahub API."""
 from typing import Any, Hashable
 
-import h5py
+import h5py  # type: ignore
 from fastapi import FastAPI, HTTPException, UploadFile
 from pydantic import BaseModel
 

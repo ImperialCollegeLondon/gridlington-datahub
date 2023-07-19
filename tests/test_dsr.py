@@ -1,4 +1,4 @@
-import h5py
+import h5py  # type: ignore
 import numpy as np
 import pytest
 from fastapi.testclient import TestClient
