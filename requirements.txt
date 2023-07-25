@@ -18,10 +18,14 @@ fastapi==0.99.1
     # via datahub (pyproject.toml)
 h11==0.14.0
     # via uvicorn
+h5py==3.9.0
+    # via datahub (pyproject.toml)
 idna==3.4
     # via anyio
 numpy==1.25.0
-    # via pandas
+    # via
+    #   h5py
+    #   pandas
 odfpy==1.4.1
     # via pandas
 openpyxl==3.1.2
@@ -32,6 +36,8 @@ pydantic==1.10.10
     # via fastapi
 python-dateutil==2.8.2
     # via pandas
+python-multipart==0.0.6
+    # via datahub (pyproject.toml)
 pytz==2023.3
     # via pandas
 pyxlsb==1.0.10

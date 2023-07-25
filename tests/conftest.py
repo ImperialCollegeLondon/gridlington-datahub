@@ -1,5 +1,6 @@
 import random
 
+import h5py  # type: ignore
 import numpy as np
 import pytest
 from fastapi.testclient import TestClient
@@ -38,12 +39,33 @@ def opal_data_array():
 
 
 @pytest.fixture
-def dsr_data():
-    """Pytest Fixture for random Opal data input."""
-    data = {}
-    for field in list(DSRModel.__fields__.values()):
-        if field.annotation == str:
-            data[field.alias] = "Name or Warning"
-        else:
-            data[field.alias] = np.random.rand(*field.field_info.extra["size"]).tolist()
+def dsr_data(dsr_data_path):
+    """Pytest Fixture for DSR data as a dictionary."""
+    with h5py.File(dsr_data_path, "r") as h5file:
+        data = {key: value[...] for key, value in h5file.items()}
     return data
+
+
+@pytest.fixture
+def dsr_data_path(tmp_path):
+    """The path to a temporary HDF5 file with first-time-only generated DSR data."""
+    # Define the file path within the temporary directory
+    file_path = tmp_path / "data.h5"
+
+    # Check if the file already exists
+    if file_path.is_file():
+        # If the file exists, return its path
+        return file_path
+
+    # Otherwise, create and write data to the file
+    with h5py.File(file_path, "w") as h5file:
+        for field in list(DSRModel.__fields__.values()):
+            if field.annotation == str:
+                h5file[field.alias] = "Name or Warning"
+            else:
+                h5file[field.alias] = np.random.rand(
+                    *field.field_info.extra["shape"]
+                ).astype("float16")
+
+    # Return the path to the file
+    return file_path
