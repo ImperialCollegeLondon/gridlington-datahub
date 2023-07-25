@@ -14,7 +14,7 @@ black==23.3.0
     # via datahub (pyproject.toml)
 build==0.10.0
     # via pip-tools
-certifi==2023.5.7
+certifi==2023.7.22
     # via
     #   httpcore
     #   httpx
@@ -47,6 +47,8 @@ h11==0.14.0
     # via
     #   httpcore
     #   uvicorn
+h5py==3.9.0
+    # via datahub (pyproject.toml)
 httpcore==0.17.2
     # via httpx
 httpx==0.24.1
@@ -71,6 +73,7 @@ nodeenv==1.8.0
     # via pre-commit
 numpy==1.25.0
     # via
+    #   h5py
     #   pandas
     #   pandas-stubs
 odfpy==1.4.1
@@ -116,6 +119,8 @@ pytest-mypy==0.10.3
     # via datahub (pyproject.toml)
 python-dateutil==2.8.2
     # via pandas
+python-multipart==0.0.6
+    # via datahub (pyproject.toml)
 pytz==2023.3
     # via pandas
 pyxlsb==1.0.10

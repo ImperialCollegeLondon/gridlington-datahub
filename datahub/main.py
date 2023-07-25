@@ -1,11 +1,13 @@
 """Script for running Datahub API."""
 from typing import Any, Hashable
 
-from fastapi import FastAPI, HTTPException
+import h5py  # type: ignore
+from fastapi import FastAPI, HTTPException, UploadFile
 from pydantic import BaseModel
 
 from . import data as dt
-from .dsr import DSRModel, validate_dsr_arrays
+from . import log
+from .dsr import validate_dsr_data
 from .opal import OpalModel
 from .wesim import get_wesim
 
@@ -28,24 +30,26 @@ def create_opal_data(data: OpalModel | OpalArrayData) -> dict[str, str]:
     Returns:
         A Dict of the Opal data that has just been added to the Dataframe
     """
+    log.info("Recieved Opal data.")
+
     raw_data = data.dict()
 
     if isinstance(data, OpalArrayData):
+        log.info("Array format detected.")
         append_input = raw_data["array"]
     else:
+        log.info("Dict format detected.")
         append_input = raw_data
 
-    # TODO: Change print statements to more formal logging
-    print(dt.opal_df)
-
     if isinstance(append_input, list) and not len(append_input) == 45:
-        raise HTTPException(
-            status_code=400, detail="Array has invalid length. Expecting 45 items."
-        )
+        message = "Array has invalid length. Expecting 45 items."
+        log.error(message)
+        raise HTTPException(status_code=400, detail=message)
 
+    log.info("Appending new data...")
+    log.debug(f"Original Opal DataFrame:\n\n{dt.opal_df}")
     dt.opal_df.opal.append(append_input)
-
-    print(dt.opal_df)
+    log.debug(f"Updated Opal DataFrame:\n\n{dt.opal_df}")
 
     return {"message": "Data submitted successfully."}
 
@@ -59,7 +63,6 @@ def get_opal_data(  # type: ignore[misc]
 
     Args:
         start: Starting index for exported Dataframe
-
         end: Last index that will be included in exported Dataframe
 
     Returns:
@@ -68,38 +71,77 @@ def get_opal_data(  # type: ignore[misc]
         This can be converted back to a Dataframe using the following:
         pd.DataFrame(**data)
     """
+    log.info("Sending Opal data...")
+    log.debug(f"Query parameters:\n\nstart={start}\nend={end}\n")
     if isinstance(end, int) and end < start:
-        raise HTTPException(
-            status_code=400, detail="End parameter cannot be less than Start parameter."
-        )
+        message = "End parameter cannot be less than Start parameter."
+        log.error(message)
+        raise HTTPException(status_code=400, detail=message)
 
+    log.info("Filtering data...")
+    log.debug(f"Current Opal DataFrame:\n\n{dt.opal_df}")
     filtered_df = dt.opal_df.loc[start:end]
+    log.debug(f"Filtered Opal DataFrame:\n\n{dt.opal_df}")
 
     data = filtered_df.to_dict(orient="split")
     return {"data": data}
 
 
 @app.post("/dsr")
-def update_dsr_data(data: DSRModel) -> dict[str, str]:
-    """POST method function for appending data to the DSR list.
+def upload_dsr(file: UploadFile) -> dict[str, str | None]:
+    """POST method for appending data to the DSR list.
+
+    This takes a HDF5 file as input. This file has a flat structure, with each dataset
+    available at the top level.
+
+    The required fields (datasets) are:
+    - Amount (13 x 1)
+    - Cost (1440 x 13)
+    - kWh Cost (2 x 1)
+    - Activities (1440 x 7)
+    - Activities Outside Home (1440 x 7)
+    - Activity Types (7 x 1)
+    - EV DT (1440 x 2)
+    - EV State (1440 x 4329)
+    - Baseline EV (1440 x 1)
+    - Baseline Non-EV (1440 x 1)
+    - Actual EV (1440 x 1)
+    - Actual Non-EV (1440 x 1)
+
+    The optional fields are:
+    - EV ID Matrix (1440 x 4329)
+    - EV Locations (1440 x 4329)
+    - EV Battery (1440 x 4329)
+    - EV Mask (1440 x 4329)
+    - Name (str)
+    - Warn (str)
+
+    Further details for the DSR data specification can be found in
+    [the GitHub wiki.](https://github.com/ImperialCollegeLondon/gridlington-datahub/wiki/Agent-model-data#output)
+
+    \f
 
     Args:
-        data: The DSR Data
-
-    Returns:
-        A dictionary with a success message
+        file (UploadFile): A HDF5 file with the DSR data.
 
     Raises:
-        A HTTPException if the data is invalid
-    """
-    data_dict = data.dict(by_alias=True)
-    if alias := validate_dsr_arrays(data_dict):
-        raise HTTPException(
-            status_code=400, detail=f"Invalid size for: {', '.join(alias)}."
-        )
-    dt.dsr_data.append(data_dict)
+        HTTPException: If the data is invalid
 
-    return {"message": "Data submitted successfully."}
+    Returns:
+        dict[str, str]: dictionary with the filename
+    """  # noqa: D301
+    log.info("Recieved Opal data.")
+    with h5py.File(file.file, "r") as h5file:
+        data = {key: value[...] for key, value in h5file.items()}
+
+    validate_dsr_data(data)
+
+    log.info("Appending new data...")
+    log.debug(f"Current DSR data length: {len(dt.dsr_data)}")
+    dt.dsr_data.append(data)
+    log.debug(f"Updated DSR data length: {len(dt.dsr_data)}")
+
+    return {"filename": file.filename}
 
 
 @app.get("/dsr")
@@ -110,18 +152,22 @@ def get_dsr_data(  # type: ignore[misc]
 
     Args:
         start: Starting index for exported list
-
         end: Last index that will be included in exported list
 
     Returns:
         A Dict containing the DSR list
     """
+    log.info("Sending DSR data...")
+    log.debug(f"Query parameters:\n\nstart={start}\nend={end}\n")
     if isinstance(end, int) and end < start:
-        raise HTTPException(
-            status_code=400, detail="End parameter cannot be less than Start parameter."
-        )
+        message = "End parameter cannot be less than Start parameter."
+        log.error(message)
+        raise HTTPException(status_code=400, detail=message)
 
+    log.info("Filtering data...")
+    log.debug(f"Current DSR data length:\n\n{len(dt.dsr_data)}")
     filtered_data = dt.dsr_data[start : end + 1 if end else end]
+    log.debug(f"Filtered DSR data length:\n\n{len(dt.dsr_data)}")
 
     return {"data": filtered_data}
 
@@ -133,7 +179,9 @@ def get_wesim_data() -> dict[Hashable, Any]:  # type: ignore[misc]
     Returns:
         A Dict containing the Wesim Dataframes
     """
+    log.info("Sending Wesim data...")
     if dt.wesim_data == {}:
+        log.debug("Wesim data empty! Creating Wesim data...")
         dt.wesim_data = get_wesim()
 
     return {"data": dt.wesim_data}

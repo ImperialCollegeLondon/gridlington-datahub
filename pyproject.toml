@@ -11,7 +11,9 @@ requires-python = ">=3.10"
 dependencies = [
     "pandas[excel]",
     "fastapi",
-    "uvicorn"
+    "uvicorn",
+    "python-multipart",
+    "h5py"
 ]
 
 [project.optional-dependencies]

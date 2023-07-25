@@ -1,29 +1,31 @@
 """This module defines the data structures for the MEDUSA Demand Simulator model."""
 import numpy as np
+from fastapi import HTTPException
+from numpy.typing import NDArray
 from pydantic import BaseModel, Field
 
 
 class DSRModel(BaseModel):
     """Define required key values for Demand Side Response data."""
 
-    amount: list = Field(alias="Amount", size=(13,))
-    cost: list = Field(alias="Cost", size=(1440, 13))
-    kwh_cost: list = Field(alias="kWh Cost", size=(2,))
-    activities: list = Field(alias="Activities", size=(1440, 7))
+    amount: list = Field(alias="Amount", shape=(13,))
+    cost: list = Field(alias="Cost", shape=(1440, 13))
+    kwh_cost: list = Field(alias="kWh Cost", shape=(2,))
+    activities: list = Field(alias="Activities", shape=(1440, 7))
     activities_outside_home: list = Field(
-        alias="Activities Outside Home", size=(1440, 7)
+        alias="Activities Outside Home", shape=(1440, 7)
     )
-    activity_types: list = Field(alias="Activity Types", size=(7,))
-    ev_id_matrix: list = Field(alias="EV ID Matrix", default=None, size=(1440, 4329))
-    ev_dt: list = Field(alias="EV DT", size=(1440, 2))
-    ev_locations: list = Field(alias="EV Locations", default=None, size=(1440, 4329))
-    ev_battery: list = Field(alias="EV Battery", default=None, size=(1440, 4329))
-    ev_state: list = Field(alias="EV State", size=(1440, 4329))
-    ev_mask: list = Field(alias="EV Mask", default=None, size=(1440, 4329))
-    baseline_ev: list = Field(alias="Baseline EV", size=(1440,))
-    baseline_non_ev: list = Field(alias="Baseline Non-EV", size=(1440,))
-    actual_ev: list = Field(alias="Actual EV", size=(1440,))
-    actual_non_ev: list = Field(alias="Actual Non-EV", size=(1440,))
+    activity_types: list = Field(alias="Activity Types", shape=(7,))
+    ev_id_matrix: list = Field(alias="EV ID Matrix", default=None, shape=(1440, 4329))
+    ev_dt: list = Field(alias="EV DT", shape=(1440, 2))
+    ev_locations: list = Field(alias="EV Locations", default=None, shape=(1440, 4329))
+    ev_battery: list = Field(alias="EV Battery", default=None, shape=(1440, 4329))
+    ev_state: list = Field(alias="EV State", shape=(1440, 4329))
+    ev_mask: list = Field(alias="EV Mask", default=None, shape=(1440, 4329))
+    baseline_ev: list = Field(alias="Baseline EV", shape=(1440,))
+    baseline_non_ev: list = Field(alias="Baseline Non-EV", shape=(1440,))
+    actual_ev: list = Field(alias="Actual EV", shape=(1440,))
+    actual_non_ev: list = Field(alias="Actual Non-EV", shape=(1440,))
     name: str = Field(alias="Name", default="")
     warn: str = Field(alias="Warn", default="")
 
@@ -33,24 +35,40 @@ class DSRModel(BaseModel):
         allow_population_by_field_name = True
 
 
-def validate_dsr_arrays(data: dict[str, str | list]) -> list[str]:
-    """Validate the sizes of the arrays in the DSR data.
+def validate_dsr_data(data: dict[str, NDArray]) -> None:
+    """Validate the shapes of the arrays in the DSR data.
 
     Args:
         data: The dictionary representation of the DSR Data. The keys are field aliases.
             It is generated with the data.dict(by_alias=True) where data is a DSRModel.
 
-    Returns:
-        An empty list if there are no issues. A list of the failing fields if there are.
+    Raises:
+        A HTTPException is there are mising failing fields if there are.
     """
+    missing_fields = [
+        field for field in DSRModel.schema()["required"] if field not in data.keys()
+    ]
+    if missing_fields:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Missing required fields: {', '.join(missing_fields)}.",
+        )
+
     aliases = []
     for alias, field in DSRModel.schema()["properties"].items():
+        try:
+            array = data[alias]
+        except KeyError:
+            if field:
+                aliases.append(alias)
+            continue
         if field["type"] == "array":
-            try:
-                array = np.array(data[alias])
-            except ValueError:
+            if array.shape != field["shape"] or not np.issubdtype(
+                array.dtype, np.number
+            ):
                 aliases.append(alias)
-                continue
-            if array.shape != field["size"] or array.dtype != np.float64:
-                aliases.append(alias)
-    return aliases
+    if aliases:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid size for: {', '.join(aliases)}.",
+        )
