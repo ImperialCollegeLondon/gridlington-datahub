@@ -3,21 +3,14 @@ from typing import Any, Hashable
 
 import h5py  # type: ignore
 from fastapi import FastAPI, HTTPException, UploadFile
-from pydantic import BaseModel
 
 from . import data as dt
 from . import log
 from .dsr import validate_dsr_data
-from .opal import OpalModel
+from .opal import OpalArrayData, OpalModel
 from .wesim import get_wesim
 
 app = FastAPI()
-
-
-class OpalArrayData(BaseModel):
-    """Class for defining required key values for Opal data as an array."""
-
-    array: list[float]
 
 
 @app.post("/opal")

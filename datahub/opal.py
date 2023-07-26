@@ -5,6 +5,12 @@ from pydantic import BaseModel, Field
 OPAL_START_DATE = "2035-01-22 00:00"
 
 
+class OpalArrayData(BaseModel):
+    """Class for defining required key values for Opal data as an array."""
+
+    array: list[float]
+
+
 class OpalModel(BaseModel):
     """Define required key values for Opal data."""
 
