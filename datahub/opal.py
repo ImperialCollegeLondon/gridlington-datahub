@@ -1,4 +1,5 @@
 """This module defines the data structures for the Opal model."""
+import numpy as np
 import pandas as pd
 from pydantic import BaseModel, Field
 
@@ -75,11 +76,24 @@ class OpalAccessor:
     """Pandas custom accessor for appending new data to Opal dataframe."""
 
     def __init__(self, pandas_obj: pd.DataFrame) -> None:
-        """Initialization of dataframe.
-
-        TODO: Add validation function.
-        """
+        """Initialization of dataframe."""
+        self._validate(pandas_obj)
         self._obj = pandas_obj
+
+    @staticmethod
+    def _validate(pandas_obj: pd.DataFrame) -> None:
+        """Validates the DataFrame to ensure it is usable by this accessor.
+
+        Raises:
+            AssertionError if the Dataset fails the validation.
+        """
+        assert set(pandas_obj.columns) == set(opal_headers.keys())
+        assert pd.api.types.is_datetime64_dtype(pandas_obj.get("Time", None))
+        assert all(
+            np.issubdtype(dtype, np.number)
+            for column, dtype in pandas_obj.dtypes.items()
+            if column != "Time"
+        )
 
     def append(self, data: dict[str, float] | list[float]) -> None:
         """Function to append new data to existing dataframe.

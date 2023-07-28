@@ -39,7 +39,13 @@ def create_opal_data(data: OpalModel | OpalArrayData) -> dict[str, str]:
 
     log.info("Appending new data...")
     log.debug(f"Original Opal DataFrame:\n\n{dt.opal_df}")
-    dt.opal_df.opal.append(append_input)
+    try:
+        dt.opal_df.opal.append(append_input)
+    except AssertionError:
+        message = "Error with Opal data on server. Fails validation."
+        log.error(message)
+        raise HTTPException(status_code=400, detail=message)
+
     log.debug(f"Updated Opal DataFrame:\n\n{dt.opal_df}")
 
     return {"message": "Data submitted successfully."}
