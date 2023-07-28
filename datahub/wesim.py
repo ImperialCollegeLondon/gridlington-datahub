@@ -137,10 +137,3 @@ def get_wesim() -> dict[str, dict[Hashable, Any]]:  # type: ignore[misc]
         "Interconnector Capacity": interconnector_capacity.to_dict(orient="split"),
         "Interconnectors": interconnectors.to_dict(orient="split"),
     }
-
-
-if __name__ == "__main__":
-    for name, df in get_wesim().items():
-        print(name + ":")
-        print(df)
-        print("--------")
