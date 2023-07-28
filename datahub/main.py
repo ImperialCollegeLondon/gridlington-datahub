@@ -1,6 +1,4 @@
 """Script for running Datahub API."""
-from typing import Any, Hashable
-
 import h5py  # type: ignore
 from fastapi import FastAPI, HTTPException, UploadFile
 
@@ -47,11 +45,10 @@ def create_opal_data(data: OpalModel | OpalArrayData) -> dict[str, str]:
     return {"message": "Data submitted successfully."}
 
 
-# TODO: Fix return typing annotation
 @app.get("/opal")
-def get_opal_data(  # type: ignore[misc]
+def get_opal_data(
     start: int = 0, end: int | None = None
-) -> dict[Hashable, Any]:
+) -> dict[str, dict]:  # type: ignore[type-arg]
     """GET method function for getting Opal Dataframe as JSON.
 
     Args:
@@ -138,9 +135,9 @@ def upload_dsr(file: UploadFile) -> dict[str, str | None]:
 
 
 @app.get("/dsr")
-def get_dsr_data(  # type: ignore[misc]
+def get_dsr_data(
     start: int = 0, end: int | None = None
-) -> dict[Hashable, Any]:
+) -> dict[str, list]:  # type: ignore[type-arg]
     """GET method function for getting DSR data as JSON.
 
     Args:
@@ -166,7 +163,7 @@ def get_dsr_data(  # type: ignore[misc]
 
 
 @app.get("/wesim")
-def get_wesim_data() -> dict[Hashable, Any]:  # type: ignore[misc]
+def get_wesim_data() -> dict[str, dict[str, dict]]:  # type: ignore[type-arg]
     """GET method function for getting Wesim data as JSON.
 
     Returns:
