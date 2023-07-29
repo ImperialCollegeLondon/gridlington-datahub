@@ -8,19 +8,26 @@ from .dsr import validate_dsr_data
 from .opal import OpalArrayData, OpalModel
 from .wesim import get_wesim
 
-app = FastAPI()
+app = FastAPI(
+    title="Gridlington DataHub",
+)
 
 
 @app.post("/opal")
 def create_opal_data(data: OpalModel | OpalArrayData) -> dict[str, str]:
     """POST method function for appending data to Opal Dataframe.
 
+    It takes the Opal data as a dictionary or list in JSON format and updates the data
+    held in the datahub and returns a success message.
+
+    \f
+
     Args:
         data: The raw opal data in either Dict or List format
 
     Returns:
         A Dict of the Opal data that has just been added to the Dataframe
-    """
+    """  # noqa: D301
     log.info("Recieved Opal data.")
 
     raw_data = data.dict()
@@ -57,16 +64,24 @@ def get_opal_data(
 ) -> dict[str, dict]:  # type: ignore[type-arg]
     """GET method function for getting Opal Dataframe as JSON.
 
+    It takes optional query parameters of:
+    - `start`: Starting index for exported Dataframe
+    - `end`: Last index that will be included in exported Dataframe
+
+    And returns a dictionary containing the Opal Dataframe in JSON format.
+
+    This can be converted back to a DataFrame using the following:
+    `pd.DataFrame(**data)`
+
+    \f
+
     Args:
         start: Starting index for exported Dataframe
         end: Last index that will be included in exported Dataframe
 
     Returns:
-        A Dict containing the Opal Dataframe in JSON format
-
-        This can be converted back to a Dataframe using the following:
-        pd.DataFrame(**data)
-    """
+        A Dict containing the Opal DataFrame in JSON format
+    """  # noqa: D301
     log.info("Sending Opal data...")
     log.debug(f"Query parameters:\n\nstart={start}\nend={end}\n")
     if isinstance(end, int) and end < start:
@@ -146,13 +161,26 @@ def get_dsr_data(
 ) -> dict[str, list]:  # type: ignore[type-arg]
     """GET method function for getting DSR data as JSON.
 
+    It takes optional query parameters of:
+    - `start`: Starting index for exported list
+    - `end`: Last index that will be included in exported list
+
+    And returns a dictionary containing the DSR data in JSON format.
+
+    This can be converted back to a DataFrame using the following:
+    `pd.DataFrame(**data)`
+
+    TODO: Ensure data is json serializable or returned in binary format
+
+    \f
+
     Args:
         start: Starting index for exported list
         end: Last index that will be included in exported list
 
     Returns:
         A Dict containing the DSR list
-    """
+    """  # noqa: D301
     log.info("Sending DSR data...")
     log.debug(f"Query parameters:\n\nstart={start}\nend={end}\n")
     if isinstance(end, int) and end < start:
@@ -172,9 +200,18 @@ def get_dsr_data(
 def get_wesim_data() -> dict[str, dict[str, dict]]:  # type: ignore[type-arg]
     """GET method function for getting Wesim data as JSON.
 
+    It returns a dictionary with the WESIM data in JSON format containing the following
+    4 DataFrames:
+    - Capacity (6, 12)
+    - Regions (30, 10)
+    - Interconnector Capacity (4, 2)
+    - Interconnectors (25, 3)
+
+    \f
+
     Returns:
         A Dict containing the Wesim Dataframes
-    """
+    """  # noqa: D301
     log.info("Sending Wesim data...")
     if dt.wesim_data == {}:
         log.debug("Wesim data empty! Creating Wesim data...")
