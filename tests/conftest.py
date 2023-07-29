@@ -69,3 +69,11 @@ def dsr_data_path(tmp_path):
 
     # Return the path to the file
     return file_path
+
+
+@pytest.fixture
+def wesim_input_data():
+    """The filepath for the test version of the wesim data."""
+    from datahub.wesim import read_wesim
+
+    return read_wesim("tests/data/wesim_example.xlsx")
