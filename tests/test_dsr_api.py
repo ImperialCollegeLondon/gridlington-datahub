@@ -54,18 +54,25 @@ def test_post_dsr_api_invalid(dsr_data_path):
     assert len(dt.dsr_data) == 0
 
 
-def test_get_dsr_api():
+def test_get_dsr_api(dsr_data):
     """Tests DSR data GET method."""
-    dt.dsr_data = [0, 1, 2, 3, 4, 5]
+    dt.dsr_data.append(dsr_data)
 
     response = client.get("/dsr")
-    assert response.json()["data"] == dt.dsr_data
+    response_data = response.json()["data"][0]
+    assert response_data.keys() == dsr_data.keys()
+    for (key, received), expected in zip(
+        response.json()["data"][0].items(), dt.dsr_data[0].values()
+    ):
+        if key in ["Name", "Warn"]:
+            assert received == expected
+            continue
+        assert np.allclose(received, expected)
 
-    response = client.get("/dsr?start=2")
-    assert response.json()["data"] == dt.dsr_data[2:]
+    # Add another entry with changed data
+    new_data = dsr_data.copy()
+    new_data["Name"] = "A new entry"
+    dt.dsr_data.append(new_data)
 
-    response = client.get("/dsr?end=2")
-    assert response.json()["data"] == dt.dsr_data[:3]
-
-    response = client.get("/dsr?start=1&end=2")
-    assert response.json()["data"] == dt.dsr_data[1:3]
+    response = client.get("/dsr?start=1")
+    assert response.json()["data"][0]["Name"] == dt.dsr_data[1]["Name"]

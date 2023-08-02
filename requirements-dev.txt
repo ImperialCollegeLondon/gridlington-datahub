@@ -80,6 +80,8 @@ odfpy==1.4.1
     # via pandas
 openpyxl==3.1.2
     # via pandas
+orjson==3.9.2
+    # via datahub (pyproject.toml)
 packaging==23.1
     # via
     #   black
