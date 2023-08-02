@@ -53,7 +53,7 @@ httpcore==0.17.2
     # via httpx
 httpx==0.24.1
     # via datahub (pyproject.toml)
-identify==2.5.24
+identify==2.5.26
     # via pre-commit
 idna==3.4
     # via
