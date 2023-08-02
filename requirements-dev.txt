@@ -89,7 +89,7 @@ pandas[excel]==2.0.3
     # via datahub (pyproject.toml)
 pandas-stubs==2.0.2.230605
     # via datahub (pyproject.toml)
-pathspec==0.11.1
+pathspec==0.11.2
     # via black
 pip-tools==6.14.0
     # via datahub (pyproject.toml)
