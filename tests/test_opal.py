@@ -1,4 +1,5 @@
 import pandas as pd
+import pytest
 
 
 def test_create_opal_frame():
@@ -65,6 +66,29 @@ def test_append_opal_data(opal_data):
     )
 
     assert (df.iloc[2, :] == list(data_3.values())[1:]).all()
+
+
+def test_append_validate(opal_data):
+    """Tests appending new row of Opal data to Dataframe using custom accessor."""
+    from datahub.opal import create_opal_frame
+
+    # Check incorrect type
+    df = create_opal_frame()
+    df["Total Generation"] = df["Total Generation"].astype(str)
+    with pytest.raises(AssertionError):
+        df.opal.append(opal_data)
+
+    df = create_opal_frame()
+    df["Time"] = df["Time"].astype(str)
+    with pytest.raises(AssertionError):
+        df.opal.append(opal_data)
+
+    df.drop("Time", axis=1, inplace=True)
+    with pytest.raises(AssertionError):
+        df.opal.append(opal_data)
+
+    # Checks that Dataframe does not have an additional row
+    assert len(df.index) == 1
 
 
 def test_append_opal_data_array(opal_data_array):

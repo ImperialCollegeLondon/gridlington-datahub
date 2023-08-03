@@ -68,6 +68,19 @@ def test_post_opal_api_invalid(client, opal_data, opal_data_array):
         "detail": "Array has invalid length. Expecting 45 items."
     }
 
+    # Check that error is raised when the data on the server has been corrupted
+    post_data = json.dumps(opal_data.copy())
+    dt.opal_df.drop("Time", axis=1, inplace=True)
+
+    response = client.post("/opal", data=post_data)
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Error with Opal data on server. Fails validation."
+    }
+
+    # Check that the Opal global variable has not been updated.
+    assert len(dt.opal_df.index) == 1
+
 
 def test_get_opal_api(client, opal_data):
     """Tests Opal data GET method."""
