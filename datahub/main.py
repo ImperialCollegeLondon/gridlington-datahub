@@ -1,10 +1,10 @@
 """Script for running Datahub API."""
-import h5py  # type: ignore
 from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi.responses import ORJSONResponse
 
 from . import data as dt
 from . import log
-from .dsr import validate_dsr_data
+from .dsr import read_dsr_file, validate_dsr_data
 from .opal import OpalArrayData, OpalModel
 from .wesim import get_wesim
 
@@ -142,8 +142,7 @@ def upload_dsr(file: UploadFile) -> dict[str, str | None]:
         dict[str, str]: dictionary with the filename
     """  # noqa: D301
     log.info("Recieved Opal data.")
-    with h5py.File(file.file, "r") as h5file:
-        data = {key: value[...] for key, value in h5file.items()}
+    data = read_dsr_file(file.file)
 
     validate_dsr_data(data)
 
@@ -155,10 +154,8 @@ def upload_dsr(file: UploadFile) -> dict[str, str | None]:
     return {"filename": file.filename}
 
 
-@app.get("/dsr")
-def get_dsr_data(
-    start: int = 0, end: int | None = None
-) -> dict[str, list]:  # type: ignore[type-arg]
+@app.get("/dsr", response_class=ORJSONResponse)
+def get_dsr_data(start: int = 0, end: int | None = None) -> ORJSONResponse:
     """GET method function for getting DSR data as JSON.
 
     It takes optional query parameters of:
@@ -193,7 +190,7 @@ def get_dsr_data(
     filtered_data = dt.dsr_data[start : end + 1 if end else end]
     log.debug(f"Filtered DSR data length:\n\n{len(dt.dsr_data)}")
 
-    return {"data": filtered_data}
+    return ORJSONResponse({"data": filtered_data})
 
 
 @app.get("/wesim")

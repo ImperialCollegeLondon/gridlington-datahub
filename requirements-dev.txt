@@ -80,6 +80,8 @@ odfpy==1.4.1
     # via pandas
 openpyxl==3.1.2
     # via pandas
+orjson==3.9.2
+    # via datahub (pyproject.toml)
 packaging==23.1
     # via
     #   black
@@ -91,7 +93,7 @@ pandas-stubs==2.0.2.230605
     # via datahub (pyproject.toml)
 pathspec==0.11.2
     # via black
-pip-tools==6.14.0
+pip-tools==7.2.0
     # via datahub (pyproject.toml)
 platformdirs==3.8.0
     # via

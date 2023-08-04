@@ -14,6 +14,7 @@ dependencies = [
     "uvicorn",
     "python-multipart",
     "h5py",
+    "orjson",
 ]
 
 [project.optional-dependencies]

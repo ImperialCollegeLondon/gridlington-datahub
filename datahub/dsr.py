@@ -1,4 +1,7 @@
 """This module defines the data structures for the MEDUSA Demand Simulator model."""
+from typing import BinaryIO
+
+import h5py  # type: ignore
 import numpy as np
 from fastapi import HTTPException
 from numpy.typing import NDArray
@@ -35,7 +38,7 @@ class DSRModel(BaseModel):
         allow_population_by_field_name = True
 
 
-def validate_dsr_data(data: dict[str, NDArray]) -> None:
+def validate_dsr_data(data: dict[str, NDArray | str]) -> None:
     """Validate the shapes of the arrays in the DSR data.
 
     Args:
@@ -62,7 +65,7 @@ def validate_dsr_data(data: dict[str, NDArray]) -> None:
             if field:
                 aliases.append(alias)
             continue
-        if field["type"] == "array":
+        if field["type"] == "array" and not isinstance(array, str):
             if array.shape != field["shape"] or not np.issubdtype(
                 array.dtype, np.number
             ):
@@ -72,3 +75,23 @@ def validate_dsr_data(data: dict[str, NDArray]) -> None:
             status_code=422,
             detail=f"Invalid size for: {', '.join(aliases)}.",
         )
+
+
+def read_dsr_file(file: BinaryIO) -> dict[str, NDArray | str]:
+    """Reads the HDF5 file that contains the DSR data into an in-memory dictionary.
+
+    Args:
+        file (BinaryIO): A binary file-like object referencing the HDF5 file
+
+    Returns:
+        The dictionary representation of the DSR Data.
+    """
+    with h5py.File(file, "r") as h5file:
+        data = {
+            key: (
+                value[...] if key not in ["Name", "Warn"] else str(value.asstr()[...])
+            )
+            for key, value in h5file.items()
+        }
+
+    return data
