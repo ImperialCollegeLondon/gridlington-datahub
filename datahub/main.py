@@ -1,35 +1,33 @@
 """Script for running Datahub API."""
-from typing import Any, Hashable
-
-import h5py  # type: ignore
 from fastapi import FastAPI, HTTPException, UploadFile
-from pydantic import BaseModel
+from fastapi.responses import ORJSONResponse
 
 from . import data as dt
 from . import log
-from .dsr import validate_dsr_data
-from .opal import OpalModel
+from .dsr import read_dsr_file, validate_dsr_data
+from .opal import OpalArrayData, OpalModel
 from .wesim import get_wesim
 
-app = FastAPI()
-
-
-class OpalArrayData(BaseModel):
-    """Class for defining required key values for Opal data as an array."""
-
-    array: list[float]
+app = FastAPI(
+    title="Gridlington DataHub",
+)
 
 
 @app.post("/opal")
 def create_opal_data(data: OpalModel | OpalArrayData) -> dict[str, str]:
     """POST method function for appending data to Opal Dataframe.
 
+    It takes the Opal data as a dictionary or list in JSON format and updates the data
+    held in the datahub and returns a success message.
+
+    \f
+
     Args:
         data: The raw opal data in either Dict or List format
 
     Returns:
         A Dict of the Opal data that has just been added to the Dataframe
-    """
+    """  # noqa: D301
     log.info("Recieved Opal data.")
 
     raw_data = data.dict()
@@ -48,29 +46,42 @@ def create_opal_data(data: OpalModel | OpalArrayData) -> dict[str, str]:
 
     log.info("Appending new data...")
     log.debug(f"Original Opal DataFrame:\n\n{dt.opal_df}")
-    dt.opal_df.opal.append(append_input)
+    try:
+        dt.opal_df.opal.append(append_input)
+    except AssertionError:
+        message = "Error with Opal data on server. Fails validation."
+        log.error(message)
+        raise HTTPException(status_code=400, detail=message)
+
     log.debug(f"Updated Opal DataFrame:\n\n{dt.opal_df}")
 
     return {"message": "Data submitted successfully."}
 
 
-# TODO: Fix return typing annotation
 @app.get("/opal")
-def get_opal_data(  # type: ignore[misc]
+def get_opal_data(
     start: int = 0, end: int | None = None
-) -> dict[Hashable, Any]:
+) -> dict[str, dict]:  # type: ignore[type-arg]
     """GET method function for getting Opal Dataframe as JSON.
+
+    It takes optional query parameters of:
+    - `start`: Starting index for exported Dataframe
+    - `end`: Last index that will be included in exported Dataframe
+
+    And returns a dictionary containing the Opal Dataframe in JSON format.
+
+    This can be converted back to a DataFrame using the following:
+    `pd.DataFrame(**data)`
+
+    \f
 
     Args:
         start: Starting index for exported Dataframe
         end: Last index that will be included in exported Dataframe
 
     Returns:
-        A Dict containing the Opal Dataframe in JSON format
-
-        This can be converted back to a Dataframe using the following:
-        pd.DataFrame(**data)
-    """
+        A Dict containing the Opal DataFrame in JSON format
+    """  # noqa: D301
     log.info("Sending Opal data...")
     log.debug(f"Query parameters:\n\nstart={start}\nend={end}\n")
     if isinstance(end, int) and end < start:
@@ -131,8 +142,7 @@ def upload_dsr(file: UploadFile) -> dict[str, str | None]:
         dict[str, str]: dictionary with the filename
     """  # noqa: D301
     log.info("Recieved Opal data.")
-    with h5py.File(file.file, "r") as h5file:
-        data = {key: value[...] for key, value in h5file.items()}
+    data = read_dsr_file(file.file)
 
     validate_dsr_data(data)
 
@@ -144,11 +154,22 @@ def upload_dsr(file: UploadFile) -> dict[str, str | None]:
     return {"filename": file.filename}
 
 
-@app.get("/dsr")
-def get_dsr_data(  # type: ignore[misc]
-    start: int = 0, end: int | None = None
-) -> dict[Hashable, Any]:
+@app.get("/dsr", response_class=ORJSONResponse)
+def get_dsr_data(start: int = 0, end: int | None = None) -> ORJSONResponse:
     """GET method function for getting DSR data as JSON.
+
+    It takes optional query parameters of:
+    - `start`: Starting index for exported list
+    - `end`: Last index that will be included in exported list
+
+    And returns a dictionary containing the DSR data in JSON format.
+
+    This can be converted back to a DataFrame using the following:
+    `pd.DataFrame(**data)`
+
+    TODO: Ensure data is json serializable or returned in binary format
+
+    \f
 
     Args:
         start: Starting index for exported list
@@ -156,7 +177,7 @@ def get_dsr_data(  # type: ignore[misc]
 
     Returns:
         A Dict containing the DSR list
-    """
+    """  # noqa: D301
     log.info("Sending DSR data...")
     log.debug(f"Query parameters:\n\nstart={start}\nend={end}\n")
     if isinstance(end, int) and end < start:
@@ -169,16 +190,25 @@ def get_dsr_data(  # type: ignore[misc]
     filtered_data = dt.dsr_data[start : end + 1 if end else end]
     log.debug(f"Filtered DSR data length:\n\n{len(dt.dsr_data)}")
 
-    return {"data": filtered_data}
+    return ORJSONResponse({"data": filtered_data})
 
 
 @app.get("/wesim")
-def get_wesim_data() -> dict[Hashable, Any]:  # type: ignore[misc]
+def get_wesim_data() -> dict[str, dict[str, dict]]:  # type: ignore[type-arg]
     """GET method function for getting Wesim data as JSON.
+
+    It returns a dictionary with the WESIM data in JSON format containing the following
+    4 DataFrames:
+    - Capacity (6, 12)
+    - Regions (30, 10)
+    - Interconnector Capacity (4, 2)
+    - Interconnectors (25, 3)
+
+    \f
 
     Returns:
         A Dict containing the Wesim Dataframes
-    """
+    """  # noqa: D301
     log.info("Sending Wesim data...")
     if dt.wesim_data == {}:
         log.debug("Wesim data empty! Creating Wesim data...")

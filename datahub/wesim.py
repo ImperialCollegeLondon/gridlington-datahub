@@ -1,6 +1,5 @@
 """This module defines the data structures for the WESIM model."""
 import os
-from typing import Any, Hashable
 
 import pandas as pd
 
@@ -114,7 +113,7 @@ def structure_capacity(df: pd.DataFrame) -> pd.DataFrame:
     return df.reset_index().replace({"Code": REGIONS_KEY})
 
 
-def get_wesim() -> dict[str, dict[Hashable, Any]]:  # type: ignore[misc]
+def get_wesim() -> dict[str, dict]:  # type: ignore[type-arg]
     """Gets the WESIM data from disk and puts it into pandas dataframes.
 
     Returns:
@@ -137,10 +136,3 @@ def get_wesim() -> dict[str, dict[Hashable, Any]]:  # type: ignore[misc]
         "Interconnector Capacity": interconnector_capacity.to_dict(orient="split"),
         "Interconnectors": interconnectors.to_dict(orient="split"),
     }
-
-
-if __name__ == "__main__":
-    for name, df in get_wesim().items():
-        print(name + ":")
-        print(df)
-        print("--------")

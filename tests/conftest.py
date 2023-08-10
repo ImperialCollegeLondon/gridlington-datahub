@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from datahub.dsr import DSRModel
+from datahub.dsr import DSRModel, read_dsr_file
 from datahub.main import app
 from datahub.opal import opal_headers
 
@@ -41,9 +41,7 @@ def opal_data_array():
 @pytest.fixture
 def dsr_data(dsr_data_path):
     """Pytest Fixture for DSR data as a dictionary."""
-    with h5py.File(dsr_data_path, "r") as h5file:
-        data = {key: value[...] for key, value in h5file.items()}
-    return data
+    return read_dsr_file(dsr_data_path)
 
 
 @pytest.fixture
@@ -65,7 +63,15 @@ def dsr_data_path(tmp_path):
             else:
                 h5file[field.alias] = np.random.rand(
                     *field.field_info.extra["shape"]
-                ).astype("float16")
+                ).astype("float32")
 
     # Return the path to the file
     return file_path
+
+
+@pytest.fixture
+def wesim_input_data():
+    """The filepath for the test version of the wesim data."""
+    from datahub.wesim import read_wesim
+
+    return read_wesim("tests/data/wesim_example.xlsx")
