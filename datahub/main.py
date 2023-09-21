@@ -155,7 +155,9 @@ def upload_dsr(file: UploadFile) -> dict[str, str | None]:
 
 
 @app.get("/dsr", response_class=ORJSONResponse)
-def get_dsr_data(start: int = 0, end: int | None = None) -> ORJSONResponse:
+def get_dsr_data(
+    start: int = len(dt.dsr_data) - 1, end: int | None = None
+) -> ORJSONResponse:
     """GET method function for getting DSR data as JSON.
 
     It takes optional query parameters of:
