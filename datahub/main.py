@@ -209,13 +209,10 @@ def get_dsr_data(
         log.info("Filtering data by column...")
         filtered_data = []
         for frame in filtered_index_data:
-            log.debug(f"Frame keys: {frame.keys()}")
             filtered_keys = {}
             for key in frame.keys():
-                log.debug(f"Key: {key}")
                 if key.lower() in columns:
                     filtered_keys[key] = frame[key]
-            log.debug(f"Filtered keys: {filtered_keys.keys()}")
             filtered_data.append(filtered_keys)
 
         return ORJSONResponse({"data": filtered_data})
