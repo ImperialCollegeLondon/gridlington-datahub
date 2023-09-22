@@ -76,3 +76,12 @@ def test_get_dsr_api(dsr_data):
 
     response = client.get("/dsr?start=1")
     assert response.json()["data"][0]["Name"] == dt.dsr_data[1]["Name"]
+
+    response = client.get("/dsr?col=activities")
+    assert len(response.json()["data"][0].keys()) == 1
+    assert "Activities" in response.json()["data"][0].keys()
+
+    response = client.get("/dsr?col=activity types,kwh cost")
+    assert len(response.json()["data"][0].keys()) == 2
+    assert "Activity Types" in response.json()["data"][0].keys()
+    assert "kWh Cost" in response.json()["data"][0].keys()

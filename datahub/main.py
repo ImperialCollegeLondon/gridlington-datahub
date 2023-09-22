@@ -190,7 +190,8 @@ def get_dsr_data(
 
     log.info("Filtering data by index...")
     log.debug(f"Current DSR data length:\n\n{len(dt.dsr_data)}")
-    filtered_data = dt.dsr_data[start : end + 1 if end else end]
+    data = dt.dsr_data.copy()
+    filtered_index_data = data[start : end + 1 if end else end]
     log.debug(f"Filtered DSR data length:\n\n{len(dt.dsr_data)}")
 
     if isinstance(col, str):
@@ -206,16 +207,20 @@ def get_dsr_data(
                 raise HTTPException(status_code=400, detail=message)
 
         log.info("Filtering data by column...")
-        for frame in filtered_data:
-            delete_keys = []
+        filtered_data = []
+        for frame in filtered_index_data:
+            log.debug(f"Frame keys: {frame.keys()}")
+            filtered_keys = {}
             for key in frame.keys():
-                if key.lower() not in columns:
-                    delete_keys.append(key)
+                log.debug(f"Key: {key}")
+                if key.lower() in columns:
+                    filtered_keys[key] = frame[key]
+            log.debug(f"Filtered keys: {filtered_keys.keys()}")
+            filtered_data.append(filtered_keys)
 
-            for key in delete_keys:
-                del frame[key]
+        return ORJSONResponse({"data": filtered_data})
 
-    return ORJSONResponse({"data": filtered_data})
+    return ORJSONResponse({"data": filtered_index_data})
 
 
 @app.get("/wesim")
