@@ -38,6 +38,13 @@ class DSRModel(BaseModel):
         allow_population_by_field_name = True
 
 
+dsr_headers = {
+    field["title"]: name
+    for name, field in DSRModel.schema(by_alias=False)["properties"].items()
+    if name != "frame"
+}
+
+
 def validate_dsr_data(data: dict[str, NDArray | str]) -> None:
     """Validate the shapes of the arrays in the DSR data.
 

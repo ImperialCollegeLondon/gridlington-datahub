@@ -4,7 +4,7 @@ from fastapi.responses import ORJSONResponse
 
 from . import data as dt
 from . import log
-from .dsr import read_dsr_file, validate_dsr_data
+from .dsr import dsr_headers, read_dsr_file, validate_dsr_data
 from .opal import OpalArrayData, OpalModel
 from .wesim import get_wesim
 
@@ -156,7 +156,7 @@ def upload_dsr(file: UploadFile) -> dict[str, str | None]:
 
 @app.get("/dsr", response_class=ORJSONResponse)
 def get_dsr_data(
-    start: int = len(dt.dsr_data) - 1, end: int | None = None
+    start: int = len(dt.dsr_data) - 1, end: int | None = None, col: str | None = None
 ) -> ORJSONResponse:
     """GET method function for getting DSR data as JSON.
 
@@ -176,21 +176,44 @@ def get_dsr_data(
     Args:
         start: Starting index for exported list
         end: Last index that will be included in exported list
+        col: Column names to filter by
 
     Returns:
         A Dict containing the DSR list
     """  # noqa: D301
     log.info("Sending DSR data...")
-    log.debug(f"Query parameters:\n\nstart={start}\nend={end}\n")
+    log.debug(f"Query parameters:\n\nstart={start}\nend={end}\ncol={col}\n")
     if isinstance(end, int) and end < start:
         message = "End parameter cannot be less than Start parameter."
         log.error(message)
         raise HTTPException(status_code=400, detail=message)
 
-    log.info("Filtering data...")
+    log.info("Filtering data by index...")
     log.debug(f"Current DSR data length:\n\n{len(dt.dsr_data)}")
     filtered_data = dt.dsr_data[start : end + 1 if end else end]
     log.debug(f"Filtered DSR data length:\n\n{len(dt.dsr_data)}")
+
+    if isinstance(col, str):
+        log.debug(f"Columns:\n\n{col.split(',')}\n")
+        columns = col.lower().split(",")
+
+        for col_name in columns:
+            dsr_columns = [x.lower() for x in dsr_headers.keys()]
+
+            if col_name not in dsr_columns:
+                message = "One or more of the specified columns are invalid."
+                log.error(message)
+                raise HTTPException(status_code=400, detail=message)
+
+        log.info("Filtering data by column...")
+        for frame in filtered_data:
+            delete_keys = []
+            for key in frame.keys():
+                if key.lower() not in columns:
+                    delete_keys.append(key)
+
+            for key in delete_keys:
+                del frame[key]
 
     return ORJSONResponse({"data": filtered_data})
 
