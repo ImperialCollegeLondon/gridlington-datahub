@@ -176,7 +176,7 @@ def get_dsr_data(
     Args:
         start: Starting index for exported list
         end: Last index that will be included in exported list
-        col: Column names to filter by
+        col: Column names to filter by, multiple values seperated by comma
 
     Returns:
         A Dict containing the DSR list
