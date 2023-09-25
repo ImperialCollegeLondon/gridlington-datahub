@@ -41,7 +41,6 @@ class DSRModel(BaseModel):
 dsr_headers = {
     field["title"]: name
     for name, field in DSRModel.schema(by_alias=False)["properties"].items()
-    if name != "frame"
 }
 
 
