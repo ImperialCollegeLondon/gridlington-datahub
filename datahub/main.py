@@ -156,20 +156,21 @@ def upload_dsr(file: UploadFile) -> dict[str, str | None]:
 
 @app.get("/dsr", response_class=ORJSONResponse)
 def get_dsr_data(
-    start: int = len(dt.dsr_data) - 1, end: int | None = None, col: str | None = None
+    start: int = -1, end: int | None = None, col: str | None = None
 ) -> ORJSONResponse:
     """GET method function for getting DSR data as JSON.
 
     It takes optional query parameters of:
-    - `start`: Starting index for exported list
-    - `end`: Last index that will be included in exported list
+    - `start`: Starting index for exported list. Defaults to -1 for the most recent
+      entry only.
+    - `end`: Last index that will be included in exported list.
+    - `col`: A comma-separated list of which columns/keys within the data to get.
+      These values are all lower-case and spaces are replaced by underscores.
 
     And returns a dictionary containing the DSR data in JSON format.
 
     This can be converted back to a DataFrame using the following:
     `pd.DataFrame(**data)`
-
-    TODO: Ensure data is json serializable or returned in binary format
 
     \f
 
@@ -199,9 +200,7 @@ def get_dsr_data(
         columns = col.lower().split(",")
 
         for col_name in columns:
-            dsr_columns = [x.lower() for x in dsr_headers.keys()]
-
-            if col_name not in dsr_columns:
+            if col_name not in dsr_headers.values():
                 message = "One or more of the specified columns are invalid."
                 log.error(message)
                 raise HTTPException(status_code=400, detail=message)
@@ -211,7 +210,7 @@ def get_dsr_data(
         for frame in filtered_index_data:
             filtered_keys = {}
             for key in frame.keys():
-                if key.lower() in columns:
+                if dsr_headers[key.title()] in columns:
                     filtered_keys[key] = frame[key]
             filtered_data.append(filtered_keys)
 
