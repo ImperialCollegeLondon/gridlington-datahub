@@ -73,6 +73,37 @@ def test_get_dsr_api(dsr_data):
     new_data = dsr_data.copy()
     new_data["Name"] = "A new entry"
     dt.dsr_data.append(new_data)
+    new_data = dsr_data.copy()
+    new_data["Name"] = "Another new entry"
+    dt.dsr_data.append(new_data)
 
+    response = client.get("/dsr")
+    assert response.json()["data"][0]["Name"] == dt.dsr_data[2]["Name"]
+
+    # Checks index filtering
     response = client.get("/dsr?start=1")
+    assert len(response.json()["data"]) == 2
     assert response.json()["data"][0]["Name"] == dt.dsr_data[1]["Name"]
+    assert response.json()["data"][1]["Name"] == dt.dsr_data[2]["Name"]
+
+    response = client.get("/dsr?start=0&end=1")
+    assert len(response.json()["data"]) == 2
+    assert response.json()["data"][0]["Name"] == dt.dsr_data[0]["Name"]
+    assert response.json()["data"][1]["Name"] == dt.dsr_data[1]["Name"]
+
+    # Checks column filtering
+    response = client.get("/dsr?col=activities")
+    assert len(response.json()["data"][0].keys()) == 1
+    assert "Activities" in response.json()["data"][0].keys()
+
+    response = client.get("/dsr?col=activity_types,kwh_cost")
+    assert len(response.json()["data"][0].keys()) == 2
+    assert "Activity Types" in response.json()["data"][0].keys()
+    assert "kWh Cost" in response.json()["data"][0].keys()
+
+    response = client.get("/dsr?start=1&col=activities")
+    assert len(response.json()["data"]) == 2
+    assert len(response.json()["data"][0].keys()) == 1
+    assert "Activities" in response.json()["data"][0].keys()
+    assert len(response.json()["data"][1].keys()) == 1
+    assert "Activities" in response.json()["data"][1].keys()
