@@ -4,7 +4,7 @@ from fastapi.responses import ORJSONResponse
 
 from . import data as dt
 from . import log
-from .dsr import read_dsr_file, validate_dsr_data
+from .dsr import dsr_headers, read_dsr_file, validate_dsr_data
 from .opal import OpalArrayData, OpalModel
 from .wesim import get_wesim
 
@@ -155,42 +155,68 @@ def upload_dsr(file: UploadFile) -> dict[str, str | None]:
 
 
 @app.get("/dsr", response_class=ORJSONResponse)
-def get_dsr_data(start: int = 0, end: int | None = None) -> ORJSONResponse:
+def get_dsr_data(
+    start: int = -1, end: int | None = None, col: str | None = None
+) -> ORJSONResponse:
     """GET method function for getting DSR data as JSON.
 
     It takes optional query parameters of:
-    - `start`: Starting index for exported list
-    - `end`: Last index that will be included in exported list
+    - `start`: Starting index for exported list. Defaults to -1 for the most recent
+      entry only.
+    - `end`: Last index that will be included in exported list.
+    - `col`: A comma-separated list of which columns/keys within the data to get.
+      These values are all lower-case and spaces are replaced by underscores.
 
     And returns a dictionary containing the DSR data in JSON format.
 
     This can be converted back to a DataFrame using the following:
     `pd.DataFrame(**data)`
 
-    TODO: Ensure data is json serializable or returned in binary format
-
     \f
 
     Args:
         start: Starting index for exported list
         end: Last index that will be included in exported list
+        col: Column names to filter by, multiple values seperated by comma
 
     Returns:
         A Dict containing the DSR list
     """  # noqa: D301
     log.info("Sending DSR data...")
-    log.debug(f"Query parameters:\n\nstart={start}\nend={end}\n")
+    log.debug(f"Query parameters:\n\nstart={start}\nend={end}\ncol={col}\n")
     if isinstance(end, int) and end < start:
         message = "End parameter cannot be less than Start parameter."
         log.error(message)
         raise HTTPException(status_code=400, detail=message)
 
-    log.info("Filtering data...")
+    log.info("Filtering data by index...")
     log.debug(f"Current DSR data length:\n\n{len(dt.dsr_data)}")
-    filtered_data = dt.dsr_data[start : end + 1 if end else end]
+    data = dt.dsr_data.copy()
+    filtered_index_data = data[start : end + 1 if end else end]
     log.debug(f"Filtered DSR data length:\n\n{len(dt.dsr_data)}")
 
-    return ORJSONResponse({"data": filtered_data})
+    if isinstance(col, str):
+        log.debug(f"Columns:\n\n{col.split(',')}\n")
+        columns = col.lower().split(",")
+
+        for col_name in columns:
+            if col_name not in dsr_headers.values():
+                message = "One or more of the specified columns are invalid."
+                log.error(message)
+                raise HTTPException(status_code=400, detail=message)
+
+        log.info("Filtering data by column...")
+        filtered_data = []
+        for frame in filtered_index_data:
+            filtered_keys = {}
+            for key in frame.keys():
+                if dsr_headers[key.title()] in columns:
+                    filtered_keys[key] = frame[key]
+            filtered_data.append(filtered_keys)
+
+        return ORJSONResponse({"data": filtered_data})
+
+    return ORJSONResponse({"data": filtered_index_data})
 
 
 @app.get("/wesim")
