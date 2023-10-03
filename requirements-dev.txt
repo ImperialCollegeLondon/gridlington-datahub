@@ -87,7 +87,7 @@ packaging==23.1
     #   black
     #   build
     #   pytest
-pandas[excel]==2.0.3
+pandas[excel]==2.1.1
     # via datahub (pyproject.toml)
 pandas-stubs==2.0.2.230605
     # via datahub (pyproject.toml)

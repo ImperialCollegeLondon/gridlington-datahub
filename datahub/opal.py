@@ -116,7 +116,7 @@ def create_opal_frame() -> pd.DataFrame:
         An initial Dataframe for the opal data with key frame 0
     """
     df = pd.DataFrame(0, index=range(1), columns=list(opal_headers.keys()))
-    df["Time"] = pd.Timestamp(OPAL_START_DATE)
+    df["Time"] = pd.Timestamp(OPAL_START_DATE).as_unit("ns")  # type: ignore[attr-defined]  # noqa: E501
 
     return df
 
