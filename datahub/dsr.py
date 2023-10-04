@@ -7,6 +7,8 @@ from fastapi import HTTPException
 from numpy.typing import NDArray
 from pydantic import BaseModel, Field
 
+from . import log
+
 
 class DSRModel(BaseModel):
     """Define required key values for Demand Side Response data."""
@@ -76,10 +78,14 @@ def validate_dsr_data(data: dict[str, NDArray | str]) -> None:
                 array.dtype, np.number
             ):
                 aliases.append(alias)
+                log.error(
+                    f"'{alias}' has shape {array.shape}, expected {field['shape']}"
+                )
+
     if aliases:
         raise HTTPException(
             status_code=422,
-            detail=f"Invalid size for: {', '.join(aliases)}.",
+            detail=f"Invalid size or data type for: {', '.join(aliases)}.",
         )
 
 
