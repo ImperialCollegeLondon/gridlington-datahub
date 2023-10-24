@@ -132,7 +132,7 @@ pyxlsb==1.0.10
     # via pandas
 pyyaml==6.0.1
     # via pre-commit
-ruff==0.0.292
+ruff==0.1.2
     # via datahub (pyproject.toml)
 six==1.16.0
     # via python-dateutil
