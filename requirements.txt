@@ -24,7 +24,7 @@ h5py==3.9.0
     # via datahub (pyproject.toml)
 idna==3.4
     # via anyio
-numpy==1.26.0
+numpy==1.26.1
     # via
     #   h5py
     #   pandas
