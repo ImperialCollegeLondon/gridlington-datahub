@@ -65,5 +65,5 @@ uvicorn==0.23.2
     # via datahub (pyproject.toml)
 xlrd==2.0.1
     # via pandas
-xlsxwriter==3.1.6
+xlsxwriter==3.1.9
     # via pandas
