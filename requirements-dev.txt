@@ -11,7 +11,7 @@ anyio==3.7.1
     #   starlette
 attrs==23.1.0
     # via pytest-mypy
-black==23.9.1
+black==23.10.1
     # via datahub (pyproject.toml)
 build==1.0.3
     # via pip-tools
