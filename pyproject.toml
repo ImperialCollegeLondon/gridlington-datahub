@@ -15,7 +15,7 @@ dependencies = [
     "python-multipart",
     "h5py",
     "orjson",
-    "pydantic<2.0",
+    "pydantic<3.0",
 ]
 
 [project.optional-dependencies]
