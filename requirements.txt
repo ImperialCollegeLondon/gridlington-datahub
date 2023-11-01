@@ -32,7 +32,7 @@ odfpy==1.4.1
     # via pandas
 openpyxl==3.1.2
     # via pandas
-orjson==3.9.7
+orjson==3.9.10
     # via datahub (pyproject.toml)
 pandas[excel]==2.1.1
     # via datahub (pyproject.toml)
