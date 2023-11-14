@@ -21,7 +21,7 @@ class DSRModel(BaseModel):
         alias="Activities Outside Home", shape=(7, 1440)
     )
     activity_types: list = Field(alias="Activity Types", shape=(1, 7))
-    ev_id_matrix: list = Field(alias="EV ID Matrix", default=[], shape=(1440, 4329))
+    ev_id_matrix: list = Field(alias="EV ID Matrix", default=[], shape=(None, 1440))
     ev_dt: list = Field(alias="EV DT", shape=(2, 1440))
     ev_locations: list = Field(alias="EV Locations", default=[], shape=(None, 1440))
     ev_battery: list = Field(alias="EV Battery", default=[], shape=(None, 1440))
