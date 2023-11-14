@@ -61,9 +61,10 @@ def dsr_data_path(tmp_path):
             if field.annotation == str:
                 h5file[field.alias] = "Name or Warning"
             else:
-                h5file[field.alias] = np.random.rand(
-                    *field.field_info.extra["shape"]
-                ).astype("float32")
+                shape = field.field_info.extra["shape"]
+                if shape[0] is None:
+                    shape = (10, shape[1])
+                h5file[field.alias] = np.random.rand(*shape).astype("float32")
 
     # Return the path to the file
     return file_path

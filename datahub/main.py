@@ -141,7 +141,7 @@ def upload_dsr(file: UploadFile) -> dict[str, str | None]:
     Returns:
         dict[str, str]: dictionary with the filename
     """  # noqa: D301
-    log.info("Received Opal data.")
+    log.info("Received DSR data.")
     data = read_dsr_file(file.file)
 
     validate_dsr_data(data)
