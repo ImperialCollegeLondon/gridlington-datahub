@@ -82,6 +82,7 @@ def validate_dsr_data(data: dict[str, NDArray | str]) -> None:
             if array.shape != shape:
                 aliases.append(alias)
                 log.error(f"'{alias}' has shape {array.shape}, expected {shape}")
+                continue
             if not np.issubdtype(array.dtype, np.number) and not np.issubdtype(
                 array.dtype, np.character
             ):
