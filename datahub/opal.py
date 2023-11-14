@@ -95,7 +95,7 @@ class OpalAccessor:
             if column != "Time"
         )
 
-    def append(self, data: dict[str, float] | list[float]) -> None:
+    def append(self, data: dict[str, int | float] | list[int | float]) -> None:
         """Function to append new data to existing dataframe.
 
         Args:
@@ -106,7 +106,7 @@ class OpalAccessor:
             data_index = data[0]
         else:
             data_index = data["frame"]
-        self._obj.loc[data_index] = row  # type: ignore[call-overload]
+        self._obj.loc[data_index] = row.loc[data_index]  # type: ignore[call-overload]
 
 
 def create_opal_frame() -> pd.DataFrame:
@@ -121,9 +121,7 @@ def create_opal_frame() -> pd.DataFrame:
     return df
 
 
-def get_opal_row(
-    data: dict[str, float] | list[float]
-) -> pd.Series:  # type: ignore[type-arg]
+def get_opal_row(data: dict[str, int | float] | list[int | float]) -> pd.DataFrame:
     """Function that creates a new row of Opal data to be appended.
 
     Args:
@@ -143,7 +141,9 @@ def get_opal_row(
         del data_array[5:8]
         del data_array[0]
 
-    row = pd.Series(data_array, name=data_index, index=list(opal_headers.keys()))
+    row = pd.DataFrame(
+        [data_array], index=[data_index], columns=list(opal_headers.keys())
+    )
     row["Time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(row["Time"], unit="S")
 
     return row
