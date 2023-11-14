@@ -39,7 +39,9 @@ def test_post_dsr_api_invalid(dsr_data_path):
     with open(dsr_data_path, "rb") as dsr_data:
         response = client.post("/dsr", files={"file": dsr_data})
         assert response.status_code == 422
-        assert response.json()["detail"] == "Invalid size for: Amount, Cost."
+        assert (
+            response.json()["detail"] == "Invalid size or data type for: Amount, Cost."
+        )
 
     # Check missing fields raises an error
     with h5py.File(dsr_data_path, "r+") as dsr_data:
