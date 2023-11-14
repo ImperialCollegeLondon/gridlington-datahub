@@ -7,11 +7,11 @@
 anyio==3.7.1
     # via
     #   fastapi
-    #   httpcore
+    #   httpx
     #   starlette
 attrs==23.1.0
     # via pytest-mypy
-black==23.9.1
+black==23.11.0
     # via datahub (pyproject.toml)
 build==1.0.3
     # via pip-tools
@@ -38,7 +38,7 @@ exceptiongroup==1.1.3
     # via
     #   anyio
     #   pytest
-fastapi==0.103.2
+fastapi==0.104.1
     # via datahub (pyproject.toml)
 filelock==3.13.1
     # via
@@ -48,13 +48,13 @@ h11==0.14.0
     # via
     #   httpcore
     #   uvicorn
-h5py==3.9.0
+h5py==3.10.0
     # via datahub (pyproject.toml)
-httpcore==0.18.0
+httpcore==1.0.2
     # via httpx
-httpx==0.25.0
+httpx==0.25.1
     # via datahub (pyproject.toml)
-identify==2.5.30
+identify==2.5.31
     # via pre-commit
 idna==3.4
     # via
@@ -62,7 +62,7 @@ idna==3.4
     #   httpx
 iniconfig==2.0.0
     # via pytest
-mypy==1.5.1
+mypy==1.7.0
     # via
     #   datahub (pyproject.toml)
     #   pytest-mypy
@@ -72,7 +72,7 @@ mypy-extensions==1.0.0
     #   mypy
 nodeenv==1.8.0
     # via pre-commit
-numpy==1.26.0
+numpy==1.26.2
     # via
     #   h5py
     #   pandas
@@ -88,7 +88,7 @@ packaging==23.2
     #   black
     #   build
     #   pytest
-pandas[excel]==2.1.2
+pandas[excel]==2.1.3
     # via datahub (pyproject.toml)
 pandas-stubs==2.1.1.230928
     # via datahub (pyproject.toml)
@@ -110,7 +110,7 @@ pydantic==1.10.13
     #   fastapi
 pyproject-hooks==1.0.0
     # via build
-pytest==7.4.2
+pytest==7.4.3
     # via
     #   datahub (pyproject.toml)
     #   pytest-cov
@@ -132,14 +132,13 @@ pyxlsb==1.0.10
     # via pandas
 pyyaml==6.0.1
     # via pre-commit
-ruff==0.1.2
+ruff==0.1.5
     # via datahub (pyproject.toml)
 six==1.16.0
     # via python-dateutil
 sniffio==1.3.0
     # via
     #   anyio
-    #   httpcore
     #   httpx
 starlette==0.27.0
     # via fastapi
@@ -163,11 +162,11 @@ typing-extensions==4.8.0
     #   uvicorn
 tzdata==2023.3
     # via pandas
-uvicorn==0.23.2
+uvicorn==0.24.0.post1
     # via datahub (pyproject.toml)
-virtualenv==20.24.5
+virtualenv==20.24.6
     # via pre-commit
-wheel==0.41.2
+wheel==0.41.3
     # via pip-tools
 xlrd==2.0.1
     # via pandas
