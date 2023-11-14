@@ -57,6 +57,19 @@ class OpalModel(BaseModel):
     ev_charge: int = Field(alias="EV Status (Charging)")
     ev_travel: int = Field(alias="EV Status (Travelling)")
     ev_idle: int = Field(alias="EV Status (Idle)")
+    sys_freq: float = Field(alias="System Frequency")
+    dsr_cost: float = Field(alias="DSR Cost")
+    dsr_power: float = Field(alias="DSR Power")
+    bm_cost_most: float = Field(alias="Balancing Market Cost (Most)")
+    bm_cost_more: float = Field(alias="Balancing Market Cost (More)")
+    bm_cost_current: float = Field(alias="Balancing Market Cost (Current)")
+    bm_cost_less: float = Field(alias="Balancing Market Cost (Less)")
+    bm_cost_least: float = Field(alias="Balancing Market Cost (Least)")
+    bm_power_most: float = Field(alias="Balancing Market Power (Most)")
+    bm_power_more: float = Field(alias="Balancing Market Power (Most)")
+    bm_power_current: float = Field(alias="Balancing Market Power (Current)")
+    bm_power_less: float = Field(alias="Balancing Market Power (Less)")
+    bm_power_least: float = Field(alias="Balancing Market Power (Least)")
 
     class Config:
         """Allow the field variable names to be used in the API call."""
