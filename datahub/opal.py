@@ -66,7 +66,7 @@ class OpalModel(BaseModel):
     bm_cost_less: float = Field(alias="Balancing Market Cost (Less)")
     bm_cost_least: float = Field(alias="Balancing Market Cost (Least)")
     bm_power_most: float = Field(alias="Balancing Market Power (Most)")
-    bm_power_more: float = Field(alias="Balancing Market Power (Most)")
+    bm_power_more: float = Field(alias="Balancing Market Power (More)")
     bm_power_current: float = Field(alias="Balancing Market Power (Current)")
     bm_power_less: float = Field(alias="Balancing Market Power (Less)")
     bm_power_least: float = Field(alias="Balancing Market Power (Least)")
@@ -77,7 +77,7 @@ class OpalModel(BaseModel):
         allow_population_by_field_name = True
 
 
-opal_headers = {
+opal_headers: dict[str, str] = {
     field["title"]: name
     for name, field in OpalModel.schema(by_alias=False)["properties"].items()
     if name != "frame"
@@ -119,7 +119,11 @@ class OpalAccessor:
             data_index = data[0]
         else:
             data_index = data["frame"]
+
+        dtypes = self._obj.dtypes
         self._obj.loc[data_index] = row.loc[data_index]  # type: ignore[call-overload]
+        self._obj[:] = self._obj.astype(dtypes)[:]
+        self._obj[self._obj.columns] = self._obj.astype(dtypes)[self._obj.columns]
 
 
 def create_opal_frame() -> pd.DataFrame:
@@ -128,8 +132,15 @@ def create_opal_frame() -> pd.DataFrame:
     Returns:
         An initial Dataframe for the opal data with key frame 0
     """
-    df = pd.DataFrame(0, index=range(1), columns=list(opal_headers.keys()))
-    df["Time"] = pd.Timestamp(OPAL_START_DATE).as_unit("ns")  # type: ignore[attr-defined]  # noqa: E501
+    dtypes = {
+        field["title"]: ("int" if field["type"] == "integer" else "float")
+        for name, field in OpalModel.schema(by_alias=False)["properties"].items()
+        if name != "frame"
+    }
+    dtypes["Time"] = "datetime64[ns]"
+
+    df = pd.DataFrame(0, index=range(0), columns=list(opal_headers.keys()))
+    df = df.astype(dtypes)
 
     return df
 
@@ -149,10 +160,7 @@ def get_opal_row(data: dict[str, int | float] | list[int | float]) -> pd.DataFra
 
     else:
         data_array = data.copy()
-        data_index = data_array[0]
-
-        del data_array[5:8]
-        del data_array[0]
+        data_index = data_array.pop(0)
 
     row = pd.DataFrame(
         [data_array], index=[data_index], columns=list(opal_headers.keys())

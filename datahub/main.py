@@ -5,7 +5,7 @@ from fastapi.responses import ORJSONResponse
 from . import data as dt
 from . import log
 from .dsr import dsr_headers, read_dsr_file, validate_dsr_data
-from .opal import OpalArrayData, OpalModel
+from .opal import OpalArrayData, OpalModel, opal_headers
 from .wesim import get_wesim
 
 app = FastAPI(
@@ -35,14 +35,18 @@ def create_opal_data(data: OpalModel | OpalArrayData) -> dict[str, str]:
     if isinstance(data, OpalArrayData):
         log.info("Array format detected.")
         append_input = raw_data["array"]
+        del append_input[5:8]
+
+        if len(append_input) != len(opal_headers) + 1:
+            message = (
+                f"Array has invalid length. Expecting {len(opal_headers) + 4} items."
+            )
+            log.error(message)
+            raise HTTPException(status_code=400, detail=message)
+
     else:
         log.info("Dict format detected.")
         append_input = raw_data
-
-    if isinstance(append_input, list) and not len(append_input) == 45:
-        message = "Array has invalid length. Expecting 45 items."
-        log.error(message)
-        raise HTTPException(status_code=400, detail=message)
 
     log.info("Appending new data...")
     log.debug(f"Original Opal DataFrame:\n\n{dt.opal_df}")
