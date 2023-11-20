@@ -4,22 +4,24 @@ import pandas as pd
 import pytest
 
 from datahub import data as dt
-from datahub.opal import create_opal_frame
 
 
 @pytest.fixture(autouse=True)
 def reset_opal_data():
     """Pytest Fixture for resetting Opal data global variable."""
+    from datahub.opal import create_opal_frame
+
     dt.opal_df = create_opal_frame()
 
 
 def test_post_opal_api(client, opal_data):
     """Tests POSTing Opal data to API."""
+    from datahub.opal import opal_headers
+
     post_data = json.dumps(opal_data.copy())
 
     # Checks that the Opal global variable can be accessed.
-    assert len(dt.opal_df.columns) == 41
-    assert len(dt.opal_df.index) == 1
+    assert dt.opal_df.shape == (0, len(opal_headers))
 
     # Checks that a POST request can be successfully made.
     response = client.post("/opal", data=post_data)
@@ -27,15 +29,16 @@ def test_post_opal_api(client, opal_data):
     assert response.json() == {"message": "Data submitted successfully."}
 
     # Checks that the Opal global variable has been updated.
-    assert len(dt.opal_df.index) == 2
+    assert len(dt.opal_df.index) == 1
 
 
 def test_post_opal_api_array(client, opal_data_array):
     """Tests POSTing Opal data to API in array format."""
+    opal_data_array[5:5] = [1, 2, 3]
     post_data = json.dumps({"array": opal_data_array.copy()})
 
     # Checks that the Opal global variable has been reset.
-    assert len(dt.opal_df.index) == 1
+    assert len(dt.opal_df.index) == 0
 
     # Checks that a POST request can be successfully made.
     response = client.post("/opal", data=post_data)
@@ -43,11 +46,13 @@ def test_post_opal_api_array(client, opal_data_array):
     assert response.json() == {"message": "Data submitted successfully."}
 
     # Checks that the Opal global variable has been updated.
-    assert len(dt.opal_df.index) == 2
+    assert len(dt.opal_df.index) == 1
 
 
 def test_post_opal_api_invalid(client, opal_data, opal_data_array):
     """Tests error handling for invalid dict POST data."""
+    from datahub.opal import opal_headers
+
     invalid_data = opal_data.copy()
     invalid_data.pop("frame")
     post_data = json.dumps(invalid_data)
@@ -65,7 +70,7 @@ def test_post_opal_api_invalid(client, opal_data, opal_data_array):
     response = client.post("/opal", data=post_data)
     assert response.status_code == 400
     assert response.json() == {
-        "detail": "Array has invalid length. Expecting 45 items."
+        "detail": f"Array has invalid length. Expecting {len(opal_headers) + 4} items."
     }
 
     # Check that error is raised when the data on the server has been corrupted
@@ -79,7 +84,7 @@ def test_post_opal_api_invalid(client, opal_data, opal_data_array):
     }
 
     # Check that the Opal global variable has not been updated.
-    assert len(dt.opal_df.index) == 1
+    assert len(dt.opal_df.index) == 0
 
 
 def test_get_opal_api(client, opal_data):
@@ -108,7 +113,7 @@ def test_opal_api_get_query(client, opal_data):
     assert response.json()["data"]["index"] == [2, 3, 4]
 
     response = client.get("/opal?end=2")
-    assert response.json()["data"]["index"] == [0, 1, 2]
+    assert response.json()["data"]["index"] == [1, 2]
 
     response = client.get("/opal?start=1&end=3")
     assert response.json()["data"]["index"] == [1, 2, 3]
