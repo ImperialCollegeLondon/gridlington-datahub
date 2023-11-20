@@ -1,5 +1,3 @@
-import random
-
 import h5py  # type: ignore
 import numpy as np
 import pytest
@@ -25,16 +23,15 @@ def opal_data():
     data = {}
     data["frame"] = 1
     for key in list(opal_headers.values()):
-        data[key] = random.random() * random.choice([10, 100])
+        data[key] = np.random.randint(100)
+    data["time"] = 8.58
     return data
 
 
 @pytest.fixture
-def opal_data_array():
+def opal_data_array(opal_data):
     """Pytest Fixture for random Opal data input in array format."""
-    data = [1, 8.58]
-    for x in range(43):
-        data.append(random.random() * random.choice([10, 100]))
+    data = list(opal_data.values())
     return data
 
 

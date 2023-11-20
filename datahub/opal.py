@@ -57,6 +57,20 @@ class OpalModel(BaseModel):
     ev_charge: int = Field(alias="EV Status (Charging)")
     ev_travel: int = Field(alias="EV Status (Travelling)")
     ev_idle: int = Field(alias="EV Status (Idle)")
+    sys_freq: float = Field(alias="System Frequency")
+    dsr_cost: float = Field(alias="DSR Cost")
+    dsr_amount: float = Field(alias="Accepted DSR Amount")
+    dsr_charging: float = Field(alias="DSR Charging")
+    bm_cost_most: float = Field(alias="Balancing Market Cost (Most)")
+    bm_cost_more: float = Field(alias="Balancing Market Cost (More)")
+    bm_cost_current: float = Field(alias="Balancing Market Cost (Current)")
+    bm_cost_less: float = Field(alias="Balancing Market Cost (Less)")
+    bm_cost_least: float = Field(alias="Balancing Market Cost (Least)")
+    bm_power_most: float = Field(alias="Balancing Market Power (Most)")
+    bm_power_more: float = Field(alias="Balancing Market Power (More)")
+    bm_power_current: float = Field(alias="Balancing Market Power (Current)")
+    bm_power_less: float = Field(alias="Balancing Market Power (Less)")
+    bm_power_least: float = Field(alias="Balancing Market Power (Least)")
 
     class Config:
         """Allow the field variable names to be used in the API call."""
@@ -64,7 +78,7 @@ class OpalModel(BaseModel):
         allow_population_by_field_name = True
 
 
-opal_headers = {
+opal_headers: dict[str, str] = {
     field["title"]: name
     for name, field in OpalModel.schema(by_alias=False)["properties"].items()
     if name != "frame"
@@ -95,7 +109,7 @@ class OpalAccessor:
             if column != "Time"
         )
 
-    def append(self, data: dict[str, float] | list[float]) -> None:
+    def append(self, data: dict[str, int | float] | list[int | float]) -> None:
         """Function to append new data to existing dataframe.
 
         Args:
@@ -106,7 +120,11 @@ class OpalAccessor:
             data_index = data[0]
         else:
             data_index = data["frame"]
-        self._obj.loc[data_index] = row  # type: ignore[call-overload]
+
+        dtypes = self._obj.dtypes
+        self._obj.loc[data_index] = row.loc[data_index]  # type: ignore[call-overload]
+        self._obj[:] = self._obj.astype(dtypes)[:]
+        self._obj[self._obj.columns] = self._obj.astype(dtypes)[self._obj.columns]
 
 
 def create_opal_frame() -> pd.DataFrame:
@@ -115,15 +133,20 @@ def create_opal_frame() -> pd.DataFrame:
     Returns:
         An initial Dataframe for the opal data with key frame 0
     """
-    df = pd.DataFrame(0, index=range(1), columns=list(opal_headers.keys()))
-    df["Time"] = pd.Timestamp(OPAL_START_DATE).as_unit("ns")  # type: ignore[attr-defined]  # noqa: E501
+    dtypes = {
+        field["title"]: ("int" if field["type"] == "integer" else "float")
+        for name, field in OpalModel.schema(by_alias=False)["properties"].items()
+        if name != "frame"
+    }
+    dtypes["Time"] = "datetime64[ns]"
+
+    df = pd.DataFrame(0, index=range(0), columns=list(opal_headers.keys()))
+    df = df.astype(dtypes)
 
     return df
 
 
-def get_opal_row(
-    data: dict[str, float] | list[float]
-) -> pd.Series:  # type: ignore[type-arg]
+def get_opal_row(data: dict[str, int | float] | list[int | float]) -> pd.DataFrame:
     """Function that creates a new row of Opal data to be appended.
 
     Args:
@@ -138,12 +161,11 @@ def get_opal_row(
 
     else:
         data_array = data.copy()
-        data_index = data_array[0]
+        data_index = data_array.pop(0)
 
-        del data_array[5:8]
-        del data_array[0]
-
-    row = pd.Series(data_array, name=data_index, index=list(opal_headers.keys()))
+    row = pd.DataFrame(
+        [data_array], index=[data_index], columns=list(opal_headers.keys())
+    )
     row["Time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(row["Time"], unit="S")
 
     return row
