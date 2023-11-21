@@ -28,7 +28,7 @@ def create_opal_data(data: OpalModel | OpalArrayData) -> dict[str, str]:
     Returns:
         A Dict of the Opal data that has just been added to the Dataframe
     """  # noqa: D301
-    log.info("Recieved Opal data.")
+    log.info("Received Opal data.")
 
     raw_data = data.dict()
 
@@ -145,7 +145,7 @@ def upload_dsr(file: UploadFile) -> dict[str, str | None]:
     Returns:
         dict[str, str]: dictionary with the filename
     """  # noqa: D301
-    log.info("Recieved Opal data.")
+    log.info("Received DSR data.")
     data = read_dsr_file(file.file)
 
     validate_dsr_data(data)

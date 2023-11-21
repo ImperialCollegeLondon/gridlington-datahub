@@ -17,7 +17,7 @@ def test_validate_dsr_data(dsr_data):
 
     with pytest.raises(HTTPException) as err:
         validate_dsr_data(dsr_data)
-    assert err.value.detail == "Invalid size for: Amount, Cost."
+    assert err.value.detail == "Invalid size or data type for: Amount, Cost."
 
     dsr_data.pop("Amount")
 
