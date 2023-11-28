@@ -166,6 +166,6 @@ def get_opal_row(data: dict[str, int | float] | list[int | float]) -> pd.DataFra
     row = pd.DataFrame(
         [data_array], index=[data_index], columns=list(opal_headers.keys())
     )
-    row["Time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(row["Time"], unit="S")
+    row["Time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(row["Time"], unit="m")
 
     return row
