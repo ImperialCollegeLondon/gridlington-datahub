@@ -285,3 +285,19 @@ def get_start_signal() -> bool:
     log.info("Start signal requested")
 
     return dt.model_running and not dt.model_resetting
+
+
+@app.get("/stop")
+def get_stop_signal() -> bool:
+    """GET method function for getting stop model signal.
+
+    It returns a boolean: True for if the model should stop running.
+
+    \f
+
+    Returns:
+        A bool flag for if the model should stop
+    """  # noqa: D301
+    log.info("Start signal requested")
+
+    return not dt.model_running
