@@ -245,3 +245,19 @@ def get_wesim_data() -> dict[str, dict[str, dict]]:  # type: ignore[type-arg]
         dt.wesim_data = get_wesim()
 
     return {"data": dt.wesim_data}
+
+
+@app.get("/start")
+def get_start_signal() -> bool:
+    """GET method function for getting start model signal.
+
+    It returns a boolean: True for if the model should start running.
+
+    \f
+
+    Returns:
+        A bool flag for if the model should start
+    """  # noqa: D301
+    log.info("Start signal requested")
+
+    return dt.model_running and not dt.model_resetting
