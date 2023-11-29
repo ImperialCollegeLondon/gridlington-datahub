@@ -266,7 +266,6 @@ def set_model_signals(start: bool) -> str:
     message = "Start signal received" if start else "Stop signal received"
     log.info(message)
     dt.model_running = start
-    dt.model_resetting = not start
 
     return message
 
