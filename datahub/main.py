@@ -247,6 +247,30 @@ def get_wesim_data() -> dict[str, dict[str, dict]]:  # type: ignore[type-arg]
     return {"data": dt.wesim_data}
 
 
+@app.post("/run_model")
+def set_model_signals(start: bool) -> str:
+    """POST method function for setting start model signal.
+
+    It the query parameter:
+    - `start`: A boolean to indicate the model should start running or stop running.
+
+    \f
+
+    Args:
+        start: A bool flag for if the model should start running or stop running.
+            True to start the model, False to stop the model.
+
+    Returns:
+        A confirmation message
+    """  # noqa: D301
+    message = "Start signal received" if start else "Stop signal received"
+    log.info(message)
+    dt.model_running = start
+    dt.model_resetting = not start
+
+    return message
+
+
 @app.get("/start")
 def get_start_signal() -> bool:
     """GET method function for getting start model signal.
