@@ -10,3 +10,12 @@ wesim_data: dict[str, dict] = {}  # type: ignore[type-arg]
 
 model_running: bool = False
 model_resetting: bool = False
+
+
+def reset_data() -> None:
+    """Reset the OPAL and DSR data to their initial (empty) values."""
+    global opal_df
+    global dsr_data
+
+    opal_df = create_opal_frame()
+    dsr_data = []
