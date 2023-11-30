@@ -9,9 +9,7 @@ from datahub import data as dt
 @pytest.fixture(autouse=True)
 def reset_opal_data():
     """Pytest Fixture for resetting Opal data global variable."""
-    from datahub.opal import create_opal_frame
-
-    dt.opal_df = create_opal_frame()
+    dt.reset_data()
 
 
 def test_post_opal_api(client, opal_data):

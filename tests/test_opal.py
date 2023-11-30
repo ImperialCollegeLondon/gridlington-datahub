@@ -44,10 +44,10 @@ def test_append_opal_data(opal_data):
 
     # Checks that data appended to Dataframe matches data input.
     data_1["time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(
-        data_1["time"], unit="S"
+        data_1["time"], unit="m"
     )
     data_2["time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(
-        data_2["time"], unit="S"
+        data_2["time"], unit="m"
     )
 
     assert (df.loc[1] == list(data_1.values())[1:]).all()
@@ -58,7 +58,7 @@ def test_append_opal_data(opal_data):
     assert len(df.index) == 2
 
     data_3["time"] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(
-        data_3["time"], unit="S"
+        data_3["time"], unit="m"
     )
 
     assert (df.loc[2] == list(data_3.values())[1:]).all()
@@ -100,6 +100,6 @@ def test_append_opal_data_array(opal_data_array):
 
     assert df.shape == (1, len(opal_headers))
 
-    data_1[1] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(data_1[1], unit="S")
+    data_1[1] = pd.Timestamp(OPAL_START_DATE) + pd.to_timedelta(data_1[1], unit="m")
 
     assert (df.loc[1] == data_1[1:]).all()

@@ -12,7 +12,7 @@ client = TestClient(app)
 @pytest.fixture(autouse=True)
 def reset_dsr_data():
     """Pytest Fixture for resetting DSR data global variable."""
-    dt.dsr_data = []
+    dt.reset_data()
 
 
 def test_post_dsr_api(dsr_data_path):

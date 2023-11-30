@@ -245,3 +245,80 @@ def get_wesim_data() -> dict[str, dict[str, dict]]:  # type: ignore[type-arg]
         dt.wesim_data = get_wesim()
 
     return {"data": dt.wesim_data}
+
+
+@app.post("/set_model_signals")
+def set_model_signals(start: bool) -> str:
+    """POST method function for setting start and stop model signals.
+
+    It has the query parameter:
+    - `start`: A boolean to indicate the model should start running or stop running.
+
+    \f
+
+    Args:
+        start: A bool flag for if the model should start running or stop running.
+            True to start the model, False to stop the model.
+
+    Returns:
+        A confirmation message
+    """  # noqa: D301
+    message = "Start signal received" if start else "Stop signal received"
+    log.info(message)
+    dt.model_running = start
+
+    return message
+
+
+@app.post("/model_ready")
+def signal_model_ready(ready: bool) -> str:
+    """POST method function for indicating when the model has reset and is ready to run.
+
+    It has the query parameter:
+    - `ready`: A boolean to indicate the model has completed setup and is ready.
+
+    \f
+
+    Args:
+        ready: A bool flag for if the model has completed setup and is ready.
+
+    Returns:
+        A confirmation message
+    """  # noqa: D301
+    message = "Ready signal received" if ready else "Not-Ready signal received"
+    log.info(message)
+    dt.model_resetting = not ready
+
+    return message
+
+
+@app.get("/start")
+def get_start_signal() -> bool:
+    """GET method function for getting start model signal.
+
+    It returns a boolean: True for if the model should start running.
+
+    \f
+
+    Returns:
+        A bool flag for if the model should start
+    """  # noqa: D301
+    log.info("Start signal requested")
+
+    return dt.model_running and not dt.model_resetting
+
+
+@app.get("/stop")
+def get_stop_signal() -> bool:
+    """GET method function for getting stop model signal.
+
+    It returns a boolean: True for if the model should stop running.
+
+    \f
+
+    Returns:
+        A bool flag for if the model should stop
+    """  # noqa: D301
+    log.info("Start signal requested")
+
+    return not dt.model_running
