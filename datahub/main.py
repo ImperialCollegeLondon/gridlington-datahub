@@ -209,24 +209,24 @@ def get_dsr_data(
                 message = "One or more of the specified columns are invalid."
                 log.error(message)
                 raise HTTPException(status_code=400, detail=message)
+    else:
+        columns = list(dsr_headers.values())
 
-        log.info("Filtering data by column...")
-        filtered_data = []
-        for frame in filtered_index_data:
-            filtered_keys = {}
-            for key in frame.keys():
-                if dsr_headers[key.title()] in columns:
-                    array = frame[key]
-                    if not isinstance(array, str) and np.issubdtype(
-                        array.dtype, np.character
-                    ):
-                        array = array.astype(str).tolist()
-                    filtered_keys[key] = array
-            filtered_data.append(filtered_keys)
+    log.info("Filtering data by column...")
+    filtered_data = []
+    for frame in filtered_index_data:
+        filtered_keys = {}
+        for key in frame.keys():
+            if dsr_headers[key.title()] in columns:
+                array = frame[key]
+                if not isinstance(array, str) and np.issubdtype(
+                    array.dtype, np.character
+                ):
+                    array = array.astype(str).tolist()
+                filtered_keys[key] = array
+        filtered_data.append(filtered_keys)
 
-        return ORJSONResponse({"data": filtered_data})
-
-    return ORJSONResponse({"data": filtered_index_data})
+    return ORJSONResponse({"data": filtered_data})
 
 
 @app.get("/wesim")

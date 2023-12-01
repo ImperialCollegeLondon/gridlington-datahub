@@ -61,7 +61,8 @@ def dsr_data_path(tmp_path):
                 shape = field.field_info.extra["shape"]
                 if shape[0] is None:
                     shape = (10, shape[1])
-                h5file[field.alias] = np.random.rand(*shape).astype("float32")
+                dtype = "|S13" if field.alias == "Activity Types" else "float32"
+                h5file[field.alias] = np.random.rand(*shape).astype(dtype)
 
     # Return the path to the file
     return file_path
