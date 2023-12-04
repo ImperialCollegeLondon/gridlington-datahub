@@ -15,7 +15,7 @@ black==23.11.0
     # via datahub (pyproject.toml)
 build==1.0.3
     # via pip-tools
-certifi==2023.7.22
+certifi==2023.11.17
     # via
     #   httpcore
     #   httpx
@@ -52,7 +52,7 @@ h5py==3.10.0
     # via datahub (pyproject.toml)
 httpcore==1.0.2
     # via httpx
-httpx==0.25.1
+httpx==0.25.2
     # via datahub (pyproject.toml)
 identify==2.5.31
     # via pre-commit
@@ -62,7 +62,7 @@ idna==3.4
     #   httpx
 iniconfig==2.0.0
     # via pytest
-mypy==1.7.0
+mypy==1.7.1
     # via
     #   datahub (pyproject.toml)
     #   pytest-mypy
