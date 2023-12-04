@@ -216,14 +216,15 @@ def get_dsr_data(
     filtered_data = []
     for frame in filtered_index_data:
         filtered_keys = {}
-        for key in frame.keys():
-            if dsr_headers[key.title()] in columns:
-                array = frame[key]
-                if not isinstance(array, str) and np.issubdtype(
-                    array.dtype, np.character
-                ):
-                    array = array.astype(str).tolist()
-                filtered_keys[key] = array
+        for key, value in frame.items():
+            if dsr_headers[key.title()] not in columns:
+                continue
+            elif not isinstance(value, str) and np.issubdtype(
+                value.dtype, np.character
+            ):
+                filtered_keys[key] = value.astype(str).tolist()
+            else:
+                filtered_keys[key] = value
         filtered_data.append(filtered_keys)
 
     return ORJSONResponse({"data": filtered_data})
