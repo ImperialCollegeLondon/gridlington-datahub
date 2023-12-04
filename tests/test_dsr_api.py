@@ -69,6 +69,9 @@ def test_get_dsr_api(dsr_data):
         if key in ["Name", "Warn"]:
             assert received == expected
             continue
+        if key in ["Activity Types"]:
+            assert received == expected.astype(str).tolist()
+            continue
         assert np.allclose(received, expected)
 
     # Add another entry with changed data

@@ -1,4 +1,5 @@
 """Script for running Datahub API."""
+import numpy as np
 from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.responses import ORJSONResponse
 
@@ -208,19 +209,25 @@ def get_dsr_data(
                 message = "One or more of the specified columns are invalid."
                 log.error(message)
                 raise HTTPException(status_code=400, detail=message)
+    else:
+        columns = list(dsr_headers.values())
 
-        log.info("Filtering data by column...")
-        filtered_data = []
-        for frame in filtered_index_data:
-            filtered_keys = {}
-            for key in frame.keys():
-                if dsr_headers[key.title()] in columns:
-                    filtered_keys[key] = frame[key]
-            filtered_data.append(filtered_keys)
+    log.info("Filtering data by column...")
+    filtered_data = []
+    for frame in filtered_index_data:
+        filtered_keys = {}
+        for key, value in frame.items():
+            if dsr_headers[key.title()] not in columns:
+                continue
+            elif not isinstance(value, str) and np.issubdtype(
+                value.dtype, np.character
+            ):
+                filtered_keys[key] = value.astype(str).tolist()
+            else:
+                filtered_keys[key] = value
+        filtered_data.append(filtered_keys)
 
-        return ORJSONResponse({"data": filtered_data})
-
-    return ORJSONResponse({"data": filtered_index_data})
+    return ORJSONResponse({"data": filtered_data})
 
 
 @app.get("/wesim")
