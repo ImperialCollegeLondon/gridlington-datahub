@@ -52,7 +52,7 @@ h5py==3.10.0
     # via datahub (pyproject.toml)
 httpcore==1.0.2
     # via httpx
-httpx==0.25.2
+httpx==0.26.0
     # via datahub (pyproject.toml)
 identify==2.5.31
     # via pre-commit
