@@ -153,7 +153,7 @@ tomli==2.0.1
     #   pytest
 types-pytz==2023.3.1.1
     # via pandas-stubs
-typing-extensions==4.8.0
+typing-extensions==4.9.0
     # via
     #   black
     #   fastapi
