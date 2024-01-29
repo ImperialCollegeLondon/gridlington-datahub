@@ -1,4 +1,5 @@
 """This module defines the data structures for the Opal model."""
+
 import numpy as np
 import pandas as pd
 from pydantic import BaseModel, Field
