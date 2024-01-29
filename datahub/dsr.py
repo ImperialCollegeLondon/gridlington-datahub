@@ -1,4 +1,5 @@
 """This module defines the data structures for the MEDUSA Demand Simulator model."""
+
 from typing import BinaryIO
 
 import h5py  # type: ignore

@@ -1,4 +1,5 @@
 """Script for running Datahub API."""
+
 import numpy as np
 from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.responses import ORJSONResponse

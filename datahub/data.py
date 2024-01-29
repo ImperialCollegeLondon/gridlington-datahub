@@ -1,4 +1,5 @@
 """This module defines the data structures for each of the models."""
+
 import pandas as pd
 from numpy.typing import NDArray
 

@@ -1,4 +1,5 @@
 """This module defines the data structures for the WESIM model."""
+
 import os
 
 import pandas as pd
