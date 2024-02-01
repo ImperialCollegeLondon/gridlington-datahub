@@ -59,7 +59,7 @@ typing-extensions==4.9.0
     #   fastapi
     #   pydantic
     #   uvicorn
-tzdata==2023.3
+tzdata==2023.4
     # via pandas
 uvicorn==0.24.0.post1
     # via datahub (pyproject.toml)
