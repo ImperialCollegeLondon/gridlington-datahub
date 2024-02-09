@@ -123,7 +123,7 @@ class OpalAccessor:
             data_index = data["frame"]
 
         dtypes = self._obj.dtypes
-        self._obj.loc[data_index] = row.loc[data_index]  # type: ignore[call-overload]
+        self._obj.loc[data_index] = row.loc[data_index]  # type: ignore[index]
         self._obj[:] = self._obj.astype(dtypes)[:]
         self._obj[self._obj.columns] = self._obj.astype(dtypes)[self._obj.columns]
 
