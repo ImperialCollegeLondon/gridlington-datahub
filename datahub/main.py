@@ -282,6 +282,9 @@ def set_model_signals(start: bool) -> str:
 def signal_model_ready(ready: bool) -> str:
     """POST method function for indicating when the model has reset and is ready to run.
 
+    This will reset the data in the DataHub to it's initial (empty) values when the
+    ready signal is received as True.
+
     It has the query parameter:
     - `ready`: A boolean to indicate the model has completed setup and is ready.
 
@@ -296,6 +299,9 @@ def signal_model_ready(ready: bool) -> str:
     message = "Ready signal received" if ready else "Not-Ready signal received"
     log.info(message)
     dt.model_resetting = not ready
+
+    if ready:
+        dt.reset_data()
 
     return message
 
