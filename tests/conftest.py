@@ -55,7 +55,7 @@ def dsr_data_path(tmp_path):
     # Otherwise, create and write data to the file
     with h5py.File(file_path, "w") as h5file:
         for field in list(DSRModel.__fields__.values()):
-            if field.annotation == str:
+            if field.annotation is str:
                 h5file[field.alias] = "Name or Warning"
             else:
                 shape = field.field_info.extra["shape"]

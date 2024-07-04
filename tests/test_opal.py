@@ -16,8 +16,7 @@ def test_create_opal_frame():
     assert np.issubdtype(df["Time"].dtype, np.datetime64)
 
     # Checks that all other data types are int or float
-    dtypes = df.dtypes
-    assert ((dtypes.drop("Time") == int) | (dtypes.drop("Time") == float)).all()
+    assert all(np.issubdtype(dtype, np.number) for dtype in df.dtypes.drop("Time"))
 
 
 def test_append_opal_data(opal_data):
