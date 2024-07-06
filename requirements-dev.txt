@@ -14,7 +14,7 @@ black==24.3.0
     # via datahub (pyproject.toml)
 build==1.0.3
     # via pip-tools
-certifi==2024.2.2
+certifi==2024.7.4
     # via
     #   httpcore
     #   httpx
