@@ -168,7 +168,7 @@ tzdata==2023.4
     # via pandas
 uvicorn==0.27.0.post1
     # via datahub (pyproject.toml)
-virtualenv==20.25.0
+virtualenv==20.26.6
     # via pre-commit
 wheel==0.42.0
     # via pip-tools
