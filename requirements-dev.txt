@@ -127,7 +127,7 @@ python-calamine==0.1.7
     # via pandas
 python-dateutil==2.8.2
     # via pandas
-python-multipart==0.0.18
+python-multipart==0.0.22
     # via datahub (pyproject.toml)
 pytz==2024.1
     # via pandas
