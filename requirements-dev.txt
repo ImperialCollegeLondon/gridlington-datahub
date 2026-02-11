@@ -170,7 +170,7 @@ uvicorn==0.27.0.post1
     # via datahub (pyproject.toml)
 virtualenv==20.26.6
     # via pre-commit
-wheel==0.42.0
+wheel==0.46.2
     # via pip-tools
 xlrd==2.0.1
     # via pandas
