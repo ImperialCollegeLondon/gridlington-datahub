@@ -16,7 +16,7 @@ exceptiongroup==1.2.0
     # via anyio
 fastapi==0.109.2
     # via datahub (pyproject.toml)
-h11==0.14.0
+h11==0.16.0
     # via uvicorn
 h5py==3.10.0
     # via datahub (pyproject.toml)
