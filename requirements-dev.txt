@@ -111,7 +111,7 @@ pydantic==1.10.14
     #   fastapi
 pyproject-hooks==1.0.0
     # via build
-pytest==8.0.0
+pytest==9.0.3
     # via
     #   datahub (pyproject.toml)
     #   pytest-cov
